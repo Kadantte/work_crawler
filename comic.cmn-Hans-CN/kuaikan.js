@@ -27,17 +27,31 @@ var crawler = new CeL.work_crawler({
 	// skip_error : true,
 
 	// 解析 作品名稱 → 作品id get_work()
-	search_URL : function(work_title, get_label) {
+	// 2022/10
+	search_URL : 'sou/',
+	parse_search_result : function(html, get_label) {
+		// html = html.between('<div class="resultList cls">');
+		// console.log(html);
+		var id_list = [], id_data = [];
+		html.each_between('<a href="/web/topic/', '</a>', function(text) {
+			id_list.push(text.between(null, '"'));
+			id_data.push(get_label(text.between('title="', '"')));
+		});
+		return [ id_list, id_data ];
+	},
+
+	search_URL_2021 : function(work_title, get_label) {
 		return 'v1/search/topic?q=' + encodeURIComponent(work_title)
 				+ '&since=0&size=20&f=3';
 	},
-	parse_search_result : function(html, get_label) {
+	parse_search_result_2021 : function(html, get_label) {
 		html = JSON.parse(html).data.hit;
 		return [ html, html ];
 	},
-	id_of_search_result : 'id',
-	title_of_search_result : 'title',
+	id_of_search_result_2021 : 'id',
+	title_of_search_result_2021 : 'title',
 
+	// old than search_URL_2021
 	search_URL_web : 's/result/',
 	parse_search_result_web : function(html, get_label) {
 		html = html.between('<div class="resultList cls">',
@@ -79,6 +93,8 @@ var crawler = new CeL.work_crawler({
 		// 選擇性屬性：須配合網站平台更改。
 		// 2019/3: 总热度 <span class="hot-num">12.83亿</span>, 2019/4: 人气值
 		};
+
+		// 由 meta data 取得作品資訊。
 		// extract_work_data(work_data, html);
 
 		html = eval(html
@@ -86,7 +102,9 @@ var crawler = new CeL.work_crawler({
 		.between('<script>window.__NUXT__=', ';</script>')).data[0];
 		// console.trace(html);
 		Object.assign(work_data, html.topicInfo);
-		work_data.chapter_list = html.comics.reverse()
+		work_data.chapter_list = html.comics
+		// 2022/10/24前 改版
+		// .reverse()
 		//
 		.map(function(chapter_data, index) {
 			chapter_data.url = 'web/comic/' + chapter_data.id;
@@ -111,9 +129,8 @@ var crawler = new CeL.work_crawler({
 		chapter_data.image_list = html.comicInfo.comicImages;
 		// delete html.comicInfo.comicImages;
 
-		if (chapter_data.limited && !work_data.start_chapter_NO_next_time) {
-			CeL.info(CeL.gettext('下次從《%1》起下載。', chapter_data.title));
-			work_data.start_chapter_NO_next_time = chapter_NO;
+		if (chapter_data.limited) {
+			this.set_start_chapter_NO_next_time(work_data, chapter_NO);
 		}
 
 		// `comicInfo` 的資訊較不精確!

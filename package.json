@@ -1,7 +1,7 @@
 {
 	"name" : "work_crawler",
 	"title" : "CeJS online novels and comics downloader",
-	"version" : "v2.12.0",
+	"version" : "v2.14.0",
 	"description" : "A tool using CeJS library to download online novels / comics.",
 	"keywords" : [ "comic-downloader", "novel-downloader", "cejs",
 			"downloader", "download-comic", "epub", "ebook", "comics",
@@ -76,13 +76,12 @@
 		"linux" : {
 			"target" : [ {
 				"target" : "AppImage",
-				"arch" : [ "x64", "ia32" ]
+				"arch" : [ "x64" ]
 			}, {
 				"target" : "deb",
-				"arch" : [ "x64", "ia32" ]
-			}, {
-				"target" : "apk",
 				"arch" : [ "x64" ]
+			}, {
+				"target" : "apk"
 			} ],
 			"category" : "Network",
 			"icon" : "gui_electron/icon/rasen2.png"
@@ -109,11 +108,11 @@
 		"node" : ">=8.12.0"
 	},
 	"devDependencies" : {
-		"electron" : "^11.2.0",
+		"electron" : "latest",
 		"electron-builder" : "latest"
 	},
 	"dependencies" : {
-		"electron-updater" : "^4.0.0",
+		"electron-updater" : "latest",
 		"gh-updater" : "latest",
 		"cejs" : "latest"
 	}

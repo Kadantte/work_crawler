@@ -1,6 +1,8 @@
 ﻿/**
  * 批量下載 Oh漫画 的工具。 Download ohmanhua comics.
  * 
+ * 2021/8/2 採用 Cloudflare 的阻斷服務攻擊保護
+ * 
  * @see 集云数据 https://www.acloudmerge.com/
  * @see http://www.z1i.cn/ https://www.007ts.co/
  */
@@ -30,7 +32,8 @@ var crawler = new CeL.work_crawler({
 	// 2019/9/27-2020/4/27: ONE漫画 https://www.onemanhua.com/
 	// 2020/5/2-2020/12/13: Oh漫画 https://www.ohmanhua.com/
 	// 2021/1/5: COCOMANHUA COCO漫画 https://www.cocomanhua.com/
-	base_URL : 'https://www.cocomanhua.com/',
+	// 2021/10/20前: 域名更改 https://www.cocomanga.com/
+	base_URL : 'https://www.cocomanga.com/',
 
 	// 解析 作品名稱 → 作品id get_work()
 	search_URL : 'search?searchString=',
@@ -196,11 +199,14 @@ var crawler = new CeL.work_crawler({
 			// https://www.cocomanhua.com/js/custom.js
 			// last-modified: 2021-01-29T19:23:11Z
 			if (image_info.urls__direct) {
-				// Will be `chapter_data.image_list`
 				mh_info.image_list = decode_base64(image_info.urls__direct)
-						.split("|SEPARATER|").map(function(url) {
-							return encodeURI(url);
-						});
+				// Will be `chapter_data.image_list`
+				.split("|SEPARATER|").map(function(url) {
+					// e.g.,
+					// https://mhpic.xiaomingtaiji.net/comic/C/%E9%87%8D%E7%94%9F%E4%B9%8B%E5%89%91%E7%A5%9E%E5%BD%92%E6%9D%A5/%E7%AC%AC7%E8%AF%9DF0_295714/2.jpg-zymk.high.webp
+					// https://mhpic.xiaomingtaiji.net/comic/C/%E9%87%8D%E7%94%9F%E4%B9%8B%E5%89%91%E7%A5%9E%E5%BD%92%E6%9D%A5/%E9%A2%84%E5%91%8A/1.jpg-zymk.middle
+					return encodeURI(url.replace('zymk.middle', 'zymk.high'));
+				});
 				// free
 				delete image_info.urls__direct;
 			}
@@ -234,6 +240,7 @@ var crawler = new CeL.work_crawler({
 			return;
 		}
 		// console.log(chapter_data);
+		var new_image_list = !!chapter_data.image_list;
 		chapter_data = Object.assign(work_data.chapter_list[chapter_NO - 1],
 				chapter_data);
 
@@ -249,7 +256,9 @@ var crawler = new CeL.work_crawler({
 		// "img.mljzmm.com"
 		+ chapter_data.domain + "/comic/" + encodeURI(chapter_data.imgpath);
 
-		if (chapter_data.image_list) {
+		if (new_image_list) {
+			// CeL.debug('不設定 Referer', 0);
+
 			// 愛奇藝圖源不可設定 Referer
 			// e.g.,
 			// http://manhua.iqiyipic.com/image/20200514/45/ce/cc_13901115_c_601_800_2290.jpg

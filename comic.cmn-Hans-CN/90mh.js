@@ -1,5 +1,5 @@
 ﻿/**
- * 批量下載 古风漫画网 的工具。 Download GuFengMH.Com comics.
+ * 批量下載 90漫画网 的工具。 Download 90mh comics.
  */
 
 'use strict';
@@ -23,13 +23,8 @@ var crawler = CeL.SinMH({
 
 	// one_by_one : true,
 
-	// chapter_time_interval : '5s',
-
-	// 2018/3/7 改變網址: http://www.gufengmh.com/ → https://www.gufengmh8.com/
-	// 2021/12/27–2022/7/12 網址: https://www.gufengmh9.com/
-	// 2022/7/16– : → https://www.123gf.com/
-	// 2023/10/14 → https://www.gufengmh.com/
-	base_URL : 'https://www.gufengmh.com/',
+	// 2022/6/10: http://www.90mh.com/
+	base_URL : 'http://www.90mh.com/',
 
 	search_URL : 'API',
 	id_of_search_result : 'slug'

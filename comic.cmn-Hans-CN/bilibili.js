@@ -21,7 +21,7 @@ var crawler = new CeL.work_crawler({
 	base_URL : 'https://manga.bilibili.com/',
 	API_BASE : 'twirp/comic.v1.Comic/',
 	// 圖床主機
-	BFS_URL : 'https://i0.hdslb.com',
+	BFS_URL : 'https://manga.hdslb.com',
 
 	// 解析 作品名稱 → 作品id get_work()
 	search_URL : function(work_title) {
@@ -71,13 +71,15 @@ var crawler = new CeL.work_crawler({
 			some_limited : work_data.is_limit || work_data.comic_type,
 
 			chapter_list : work_data.ep_list.map(function(chapter_data) {
-				return {
+				chapter_data = {
 					id : chapter_data.id,
 					title : chapter_data.short_title
 					// e.g., https://manga.bilibili.com/detail/mc26723
 					+ (chapter_data.title ? ' ' + chapter_data.title : ''),
-					limited : chapter_data.is_locked,
-					url : [ this.API_BASE + 'Index?device=h5&platform=h5',
+					limited : chapter_data.is_locked || chapter_data.pay_mode,
+					url : [ this.API_BASE
+					// 2021/12/2–2021/12/17 之間? 哔哩哔哩漫画 改版
+					+ 'GetImageIndex?device=pc&platform=web',
 					//
 					{
 						ep_id : chapter_data.id
@@ -92,6 +94,7 @@ var crawler = new CeL.work_crawler({
 						}
 					} ]
 				};
+				return chapter_data;
 			}, this).reverse(),
 			chapter_count : work_data.total
 		});
@@ -107,21 +110,56 @@ var crawler = new CeL.work_crawler({
 	// 執行在解析章節資料 process_chapter_data() 之前的作業 (async)。
 	// 必須自行保證執行 callback()，不丟出異常、中斷。
 	: function(XMLHttp, work_data, callback, chapter_NO) {
-		var _this = this, data_URL = JSON.parse(XMLHttp.responseText),
-		//
-		data_file_directory, data_file_path,
-		//
-		chapter_data = work_data.chapter_list[chapter_NO - 1];
+		// console.log(XMLHttp);
+		// console.log(XMLHttp.responseText);
+		var data_URL, chapter_data = work_data.chapter_list[chapter_NO - 1];
+		try {
+			data_URL = JSON.parse(XMLHttp.responseText);
+		} catch (e) {
+		}
+		// console.log(data_URL.msg);
+		if (!data_URL || !data_URL.data || !data_URL.data.path) {
+			// e.g., node bilibili.js 26470
+			// console.trace(data_URL);
+			if (work_data.is_limit
+			// && data_URL.code === 'invalid_argument'
+			) {
+				CeL.error(CeL.gettext('無法閱覽%1《 %2》，直接跳過本漫畫！',
+				// 放棄下載
+				work_data.japan_comic ? '日本漫畫' : '本漫畫', work_data.title));
+				if (false) {
+					console.trace(work_data.chapter_list.length,
+							work_data.chapter_count);
+				}
+				work_data.jump_to_chapter = work_data.chapter_count + 1;
+			}
+			if (chapter_data.limited) {
+				this.set_start_chapter_NO_next_time(work_data, chapter_NO);
+			}
+			callback();
+			return;
+		}
 
-		data_URL = this.BFS_URL + data_URL.data;
+		var _this = this, data_file_directory, data_file_path;
+
+		data_URL = this.BFS_URL + data_URL.data.path;
 		this.get_URL(data_URL, function(XMLHttp) {
 			// console.log(XMLHttp);
+			// console.log(XMLHttp.responseText);
+
+			if (XMLHttp.statusText === 'Forbidden'
+			// 2022/1/20 17:52:27 觀看此章節前需要先登錄
+			&& XMLHttp.responseText.includes('<h1>403 Forbidden</h1>')) {
+				chapter_data.limited = true;
+				callback();
+				return;
+			}
 
 			var indexData = XMLHttp.buffer;
 			if (!indexData || (indexData = indexData
 			// .slice(9): skip "BILICOMIC"...
 			.slice(9)).length === 0) {
-				// PC端只給看10話？或可由 pwork_data.age_allow 來檢查？
+				// 2021/12 改版前 PC端只給看10話？或可由 pwork_data.age_allow 來檢查？
 				// chapter_data.image_list = [];
 				callback();
 				return;
@@ -129,10 +167,14 @@ var crawler = new CeL.work_crawler({
 
 			unhashContent(chapter_data.id, work_data.id, indexData);
 
-			data_file_directory = work_data.directory + chapter_NO.pad(4)
-					+ '.tmp' + CeL.env.path_separator;
+			data_file_directory = work_data.directory
+			// 4: @see chapter_directory_name
+			// @ CeL.application.net.work_crawler.chapter
+			+ chapter_NO.pad(work_data.chapter_NO_pad_digits || 4) + '.tmp'
+					+ CeL.env.path_separator;
 			CeL.create_directory(data_file_directory);
-			data_file_path = data_file_directory + chapter_NO.pad(4)
+			data_file_path = data_file_directory
+					+ chapter_NO.pad(work_data.chapter_NO_pad_digits || 4)
 					+ '.data.zip';
 			CeL.write_file(data_file_path, indexData);
 
@@ -156,27 +198,24 @@ var crawler = new CeL.work_crawler({
 			// 清理戰場。
 			CeL.remove_directory(data_file_directory, true);
 
-			chapter_data.image_list = chapter_data.pics.map(function(url) {
-				// e.prototype.getAndDecodeIndex = function(t) @
-				// https://s1.hdslb.com/bfs/static/manga/mobile/static/js/read.b8ba074e2011370f741a.js
-				return url.replace(".JPG", ".jpg");
-			});
-			// console.log(chapter_data);
+			chapter_data.image_list = chapter_data.pics;
 
 			var get_URL_options = chapter_data.url[2];
 			_this.get_URL_options.headers.Referer
 			// @see parse_work_data() above
 			= get_URL_options.headers.Referer;
-			_this.get_URL(_this.API_BASE + 'ImageToken?device=h5&platform=h5',
+			_this.get_URL(_this.API_BASE + 'ImageToken?device=pc&platform=web',
 			//
 			function(XMLHttp) {
 				// console.log(XMLHttp);
 				var response = XMLHttp.responseText;
+				// console.log(response);
 				try {
 					response = JSON.parse(response);
 				} catch (e) {
 					// TODO: handle exception
 				}
+				// console.log(response);
 				if (!response || !response.data) {
 					CeL.error('下載出錯！假如反覆出現此錯誤，並且確認圖片沒問題，煩請回報。取得資料：'
 							+ XMLHttp.responseText);

@@ -1,5 +1,7 @@
 ﻿/**
  * 批量下載动漫之家漫画网 原创+漫画频道(日漫)的工具。 Download www.dmzj, manhua.dmzj comics.
+ * 
+ * TODO: https://github.com/tachiyomiorg/tachiyomi-extensions/pull/5624/files
  */
 
 'use strict';
@@ -200,8 +202,8 @@ var crawler = new CeL.work_crawler({
 					// 指定圖片要儲存檔的檔名。
 					file_name : function(work_data, chapter, index) {
 						return (matched ? matched[1] : work_data.id)
-						// @see function process_images() @
-						// CeL.application.net.work_crawler
+						// 3: @see function normalize_image_data() @
+						// CeL.application.net.work_crawler.chapter
 						+ '-' + chapter + '-' + (index + 1).pad(3) + '.jpg'
 					},
 					url : 'http://images.dmzj.com/' + url
@@ -213,7 +215,10 @@ var crawler = new CeL.work_crawler({
 
 		// console.log(chapter_data.image_list);
 		return chapter_data;
-	}
+	},
+
+	// e.g., diyilianren 第一恋人
+	trim_trailing_newline : true
 });
 
 // ----------------------------------------------------------------------------

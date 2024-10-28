@@ -135,8 +135,10 @@ if (data_directory
 	} catch (e) {
 		// 只 call 一次 CeL.warn()，這樣在 GUI 會顯示在同一行。
 		CeL.warn([ {
+			// gettext_config:{"id":"warning-unable-to-access-the-storage-directory-$1"}
 			T : [ '警告：無法存取作品存放目錄 [%1]！', data_directory ]
 		}, '\n', {
+			// gettext_config:{"id":"the-downloaded-file-will-be-placed-in-the-default-directory"}
 			T : '下載的檔案將放在預設目錄下。'
 		} ]);
 		data_directory = '';
@@ -158,6 +160,14 @@ function option_type_token(arg_type_data, colors) {
 			condition = JSON.stringify(condition);
 		}
 		option_types.push({
+			// gettext_config:{"id":"number","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"function","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"boolean","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"string","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"fso_file","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"fso_files","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"fso_directory","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"fso_directories","mark_type":"combination_message_id"}
 			T : type,
 			S : {
 				color : colors && colors[0] || 'green'
@@ -191,10 +201,12 @@ if (is_CLI && !work_id && require.main
 // 檔案整理工具不需要下載作品，因此也不需要作品名稱。
 && (typeof need_work_id === 'undefined' || need_work_id)) {
 	CeL.info({
+		// gettext_config:{"id":"cejs-online-novels-comics-downloader"}
 		T : 'CeJS 網路小說漫畫下載工具'
 	});
 	CeL.log({
 		T : [
+				// gettext_config:{"id":"to-use-the-graphical-interface-please-execute-`$1`"}
 				'欲採用圖形介面請執行 `%1`。',
 				'start_gui_electron.'
 						+ (CeL.platform.is_Windows() ? 'bat' : 'sh') ]
@@ -206,25 +218,31 @@ if (is_CLI && !work_id && require.main
 	var main_script = require.main
 			&& require.main.filename.match(/[^\\\/]+$/)[0],
 	//
-	options_arguments = ' [' + CeL.gettext('option=true') + '] ["'
-			+ CeL.gettext('option=value') + '"]';
+	options_arguments = ' ['
+	// gettext_config:{"id":"option=true"}
+	+ CeL.gettext('option=true') + '] ["'
+	// gettext_config:{"id":"option=value"}
+	+ CeL.gettext('option=value') + '"]';
 
 	// 顯示幫助信息/用法說明。
 	CeL.log({
+		// gettext_config:{"id":"usage"}
 		T : 'Usage:'
 	});
 	// 分兩行顯示可以避免大螢幕上紫色背景不斷行問題。
 	CeL.log({
-		T : '	node ' + main_script + ' "' + CeL.gettext('作品標題或 id') + '"'
-				+ options_arguments,
+		T : '	node ' + main_script + ' "'
+		// gettext_config:{"id":"work-title-work-id"}
+		+ CeL.gettext('作品標題或 id') + '"' + options_arguments,
 		S : {
 			color : 'white',
 			backgroundColor : 'magenta'
 		}
 	});
 	CeL.log({
-		T : '	node ' + main_script + ' "l=' + CeL.gettext('作品列表檔案') + '"'
-				+ options_arguments,
+		T : '	node ' + main_script + ' "l='
+		// gettext_config:{"id":"work-list-file"}
+		+ CeL.gettext('作品列表檔案') + '"' + options_arguments,
 		S : {
 			color : 'white',
 			backgroundColor : 'magenta'
@@ -235,6 +253,7 @@ if (is_CLI && !work_id && require.main
 	// --------------------------------
 
 	CeL.log({
+		// gettext_config:{"id":"options"}
 		T : 'Options:'
 	});
 	Object.entries(CeL.work_crawler.prototype.import_arg_hash)
@@ -248,6 +267,51 @@ if (is_CLI && !work_id && require.main
 			}
 		}, option_type_token(pair[1]) ]);
 		CeL.log([ '    ', {
+			// gettext_config:{"id":"download_options.recheck","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.show_information_only","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.start_chapter","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.start_chapter_no","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.start_chapter_title","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.start_list_serial","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.rearrange_list_file","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.regenerate","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.reget_chapter","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.search_again","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.cache_title_to_id","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.chapter_time_interval","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.chapter_filter","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.acceptable_types","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.archive_images","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.archive_all_good_images_only","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.remove_images_after_archive","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.images_archive_extension","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.max_error_retry","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.allow_eoi_error","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.min_length","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.timeout","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.skip_error","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.skip_chapter_data_error","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.preserve_work_page","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.preserve_chapter_page","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.remove_ebook_directory","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.one_by_one","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.overwrite_old_file","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.convert_to_language","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.discard_old_ebook_file","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.vertical_writing","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.main_directory","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.user_agent","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.proxy","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.cookie","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.write_chapter_metadata","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.write_image_metadata","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.archive_old_works","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.modify_work_list_when_archive_old_works","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.save_preference","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.data_directory","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.preserve_download_work_layer","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.play_finished_sound","mark_type":"combination_message_id"}
+			// gettext_config:{"id":"download_options.archive_program_path","mark_type":"combination_message_id"}
 			T : CeL.gettext('download_options.' + pair[0]),
 			S : {
 				color : 'white'
@@ -278,7 +342,9 @@ function setup_crawler(crawler, crawler_module) {
 	// 下載檔案儲存目錄路徑。圖片檔與紀錄檔的下載位置。下載網路的作品檔案後，將儲存於此目錄下。
 	crawler.setup_value('main_directory', data_directory + crawler.id);
 
-	crawler.setup_value(site_configuration[crawler.id]);
+	crawler.setup_value(
+	//
+	crawler.site_configuration = site_configuration[crawler.id]);
 
 	if (proxy_server) {
 		crawler.setup_value('proxy', proxy_server);

@@ -17,9 +17,12 @@ CeL.manhuadb({
 	// manhuacat.js: 一次下載太多檔案，會造成IP被圖片伺服器封鎖超過1天。
 	// chapter_time_interval : '10s',
 	// 單行本圖片較多且大，因此採用一個圖一個圖取得的方式。
-	one_by_one : '2s',
+	// 2021/12/5 2s 太過頻繁會被封鎖。
+	one_by_one : '4s',
 
-	base_URL : 'https://www.manhuacat.com/',
+	// 2022/3/21 6:37 最後一次成功連接 https://www.manhuacat.com/
+	// 2022/4/24 6:49:8 域名更換 https://www.maofly.com/
+	base_URL : 'https://www.maofly.com/',
 
 	acceptable_types : 'webp|jpg',
 

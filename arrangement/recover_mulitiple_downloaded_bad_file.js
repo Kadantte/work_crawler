@@ -1,13 +1,6 @@
 ﻿/**
  * @fileoverview 當多次下載一個大檔案，卻各有不同錯誤時，可利用本工具回復原先完整的檔案。將以多數檔案的內容為準。最好下載三次以上，方便比對。
  * 
- * @examples<code>
-
-node recover_mulitiple_downloaded_bad_file.js "target file.rar" "bad file.*.rar"
-node recover_mulitiple_downloaded_bad_file.js "target file path" "bad file 1" "bad file 2" "bad file 3"
-
-</code>
- * 
  * @since 2020/11/24 18:14:33 初版
  */
 
@@ -26,6 +19,71 @@ CeL.run(
 
 // ----------------------------------------------------------------------------
 
+//console.trace(process.argv);
+const target_file_path = process.argv[2];
+
+const from_fso_list = [];
+for (let index = 3; index < process.argv.length; index++) {
+	//console.log([process.argv[index], CeL.extract_wildcard(process.argv[index])]);
+	from_fso_list.append(CeL.extract_wildcard(process.argv[index]));
+}
+
+if (target_file_path && from_fso_list.length === 0) {
+	// for `${cmd_prefix} "target file.rar"`
+	//console.trace(target_file_path);
+	let PATTERN_file_name = target_file_path.match(/^(.+[\\\/])?([^\\\/]+)$/, '');
+	//console.trace(PATTERN_file_name);
+	const base_directory = PATTERN_file_name[1] || './';
+	//console.trace(base_directory);
+	PATTERN_file_name = PATTERN_file_name[2].match(/^(.+)(\.[^.]+)$/) || [, PATTERN_file_name[2], ''];
+	//console.trace(PATTERN_file_name);
+	PATTERN_file_name = new RegExp('^' + CeL.to_RegExp_pattern(PATTERN_file_name[1]) + ' \\((\\d+)\\)' + CeL.to_RegExp_pattern(PATTERN_file_name[2]) + '$');
+	//console.trace(PATTERN_file_name);
+	const serials = [];
+	CeL.read_directory(base_directory).filter(file_name => {
+		const matched = file_name.match(PATTERN_file_name);
+		if (matched) {
+			serials.push(matched[1]);
+			from_fso_list.push(base_directory + file_name);
+			return true;
+		}
+	});
+	//console.trace(from_fso_list);
+	if (from_fso_list.length < 2) {
+		CeL.error('符合模式的檔案少於兩個，無足夠資料合併。 ' + PATTERN_file_name);
+		from_fso_list.truncate();
+	} else {
+		let rename_to;
+		//可用的 serial
+		for (let available_serial = 1; ; available_serial++) {
+			rename_to = target_file_path.replace(/(\.[^.]+)$/, ' (' + available_serial + ')$1');
+			if (!from_fso_list.includes(rename_to)) {
+				break;
+			}
+		}
+		//console.trace(rename_to);
+		CeL.info(`Rename [${target_file_path}] → [${rename_to}]`);
+		CeL.move_file(target_file_path, rename_to);
+		from_fso_list.unshift(rename_to);
+	}
+}
+
+if (!target_file_path || from_fso_list.length === 0) {
+	const cmd_prefix = `node ${process.argv[1]}`;
+	CeL.log(`當多次下載一個大檔案，卻各有不同錯誤時，可利用本工具回復原先完整的檔案。
+
+Usage:
+	${cmd_prefix} "target file.rar"
+		- This will find "target file (2).rar", "target file (3).rar",
+		  rename "target file.rar" to → "target file (1).rar",
+		  and combine to "target file.rar".
+	${cmd_prefix} "target file.rar" "bad file.*.rar"
+	${cmd_prefix} "target file path" "bad file 1" "bad file 2" "bad file 3"`);
+	process.exit();
+}
+
+CeL.info(`合併損壞的檔案成 →	${target_file_path}：\n\t${from_fso_list.join('\n\t')}`);
+
 const node_fs = require('fs');
 // 1 MiB
 const BUFFER_SIZE = 1 * 1024 * 1024;
@@ -34,15 +92,8 @@ const BUFFER_INDEX_TO_WRITE = 0;
 
 let different_byte_count = 0, doubtful_byte_count = 0;
 
-const target_file_path = process.argv[2];
 const target_fd = node_fs.openSync(target_file_path, 'w');
-
-const from_fso_list = [], bad_block_list = [];
-for (let index = 3; index < process.argv.length; index++) {
-	//console.log([process.argv[index], CeL.extract_wildcard(process.argv[index])]);
-	from_fso_list.append(CeL.extract_wildcard(process.argv[index]));
-}
-CeL.info(`合併損壞的檔案成 →	${target_file_path}：\n\t${from_fso_list.join('\n\t')}`);
+const bad_block_list = [];
 const from_fd_list = [], from_buffer_list = [];
 let max_size = 0;
 from_fso_list.forEach(fso_name => {

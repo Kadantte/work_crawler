@@ -4,6 +4,12 @@
  * @since 2018/8/7<br />
  *        2018/8/20 18:10:52 use (new CeL.EPUB(epub_directory)).archive()
  * 
+ * <code>
+
+node "path/to/work_crawler/book.cmn-Hant-TW/epub_hans_to_hant.js" "path/to/ebook.epub" "work_title=work title"
+
+</code>
+ * 
  * @see CeL.application.net.work_crawler.ebook
  *      https://github.com/ThanatosDi/EpubConv_Python
  */
@@ -22,8 +28,36 @@ var gettext;
 function initialization() {
 	gettext = CeL.gettext;
 	return Promise.resolve(CeL.using_CeCC({
+		skip_server_test : true,
 		try_LTP_server : true
 	})).then(handle_files);
+}
+
+function guess_work_title(epub_directory) {
+	var work_title = CeL.env.arg_hash && CeL.env.arg_hash.work_title;
+	if (work_title)
+		return work_title;
+
+	var matched = epub_directory.match(/《([^《》]+)》$/);
+	if (matched) {
+		work_title = matched[1];
+	}
+	if (!work_title) {
+		work_title = epub_directory.match(/[^\\\/]+$/)[0].replace(/\.[^.]+$/,
+				'');
+	}
+	// Calibre2 轉存時，會存成 "work title - author.epub"
+	matched = work_title.match(/^(.+?) - (.+)$/);
+	if (matched)
+		work_title = matched[1].trim();
+
+	if (work_title) {
+		// 偵測作品標題：
+		CeL.info('guess_work_title: 《' + work_title + '》');
+	}
+
+	// console.trace([ work_title, matched ]);
+	return work_title;
 }
 
 function handle_files() {
@@ -48,38 +82,49 @@ function handle_files() {
 	// CeL.set_debug();
 	var epub_directory = epub_file_path.replace(/\.[^.]+$/, '').trim();
 	CeL.debug({
-		T : [ '移除目錄：%1', epub_directory ]
+		// gettext_config:{"id":"removing-directory-$1"}
+		T : [ 'Removing directory: %1', epub_directory ]
 	});
 	CeL.remove_directory(epub_directory, true);
 
 	CeL.debug({
+		// gettext_config:{"id":"extract-ebook-as-cache-$1"}
 		T : [ 'Extract ebook as cache: [%1]', epub_file_path ]
 	});
 	archive_file.ebook_file_list = [];
 
-	var work_title = epub_directory.match(/[^\\\/]+$/)[0].replace(/\.[^.]+$/,
-			'');
-	// Calibre2 轉存時，會存成 "work title - author.epub"
-	var matched = work_title.match(/^(.+?) - (.+)$/);
-	if (matched)
-		work_title = matched[1];
-	// console.trace([work_title,matched]);
+	work_title = guess_work_title(epub_directory);
+	// console.trace(work_title);
 
 	// --------------------------------
 
 	var file_count = 0;
 
 	var convert_options = {
+		work_title : work_title,
 		// only for debug CeCC 繁簡轉換。
 		cache_directory : CeL.append_path_separator(
 		// "main file name - 繁簡轉換 cache/"
 		epub_directory.replace(/[\/]*$/, ' - 繁簡轉換 cache')),
 		cache_file_for_short_sentences : true,
-		// 超過此長度才 cache。
+
+		// default (undefined) or 'word': 每個解析出的詞單獨作 zh_conversion。
+		// 'combine': 結合未符合分詞字典規則之詞一併轉換。converter 必須有提供輸入陣列的功能。
+		// false: 按照原始輸入，不作 zh_conversion。
+		forced_convert_mode : 'combine',
+
+		// 檢查字典檔的規則。debug 用，會拖累效能。
+		// check_dictionary : true,
+
+		// 不檢查/跳過通同字/同義詞，通用詞彙不算錯誤。用於無法校訂原始文件的情況。
+		skip_check_for_synonyms : true,
+
+		// 超過此長度才創建個別的 cache 檔案，否則會放在 .cache_file_for_short_sentences。
 		min_cache_length : 20
 	};
 
 	return new Promise(function(resolve, reject) {
+		// gettext_config:{"id":"extract-ebook-as-cache-$1"}
 		CeL.log_temporary(gettext('Extract ebook as cache: [%1]',
 				epub_file_path));
 		archive_file.extract({
@@ -99,12 +144,13 @@ function handle_files() {
 				});
 				if (CeL.is_thenable(promise_load_text_to_check)) {
 					// console.trace(promise_load_text_to_check);
-					return promise_load_text_to_check.then(convert_files.bind(
-							null, output));
+					return promise_load_text_to_check.then(
+							convert_files.bind(null, output)).then(resolve,
+							reject);
 				}
 			}
 
-			convert_files(output).then(resolve);
+			convert_files(output).then(resolve, reject);
 		});
 	});
 
@@ -130,17 +176,20 @@ function handle_files() {
 				+ gettext.to_standard('cmn-Hant-TW') + ')$1');
 		CeL.remove_file(converted_epub_file);
 
+		// gettext_config:{"id":"start-building-e-books"}
 		CeL.log_temporary(gettext('開始建構電子書……', converted_epub_file));
 		// 打包 epub。結果會存放到與 epub_file_path 相同的目錄。
-		(new CeL.EPUB(epub_directory)).archive(converted_epub_file, true,
-				archive_file.ebook_file_list);
+		var error = (new CeL.EPUB(epub_directory)).archive(converted_epub_file,
+		// if error occurred, do not remove directory.
+		function(error) {
+			return !error;
+		}, archive_file.ebook_file_list);
 
-		// TODO: if error occurred, do not remove directory.
-		CeL.debug({
-			T : [ '移除目錄：%1', epub_directory ]
-		});
-		CeL.remove_directory(epub_directory, true);
+		// CeL.remove_directory(epub_directory, true);
 		CeL.info('Convert epub: 繁簡轉換完畢: ' + converted_epub_file);
+		if (error) {
+			CeL.error(error);
+		}
 
 		var cecc = CeL.CN_to_TW && CeL.CN_to_TW.cecc;
 		if (cecc && cecc.report_text_to_check) {
@@ -159,10 +208,10 @@ function handle_files() {
 			return;
 
 		++file_count;
-		process.title = file_count + '/' + options.all_file_count + ' → hant';
-		CeL.log_temporary('Convert to hant ' + file_count + '/'
+		process.title = file_count + '/' + options.all_file_count + ' → 繁體中文';
+		CeL.log_temporary('轉換為繁體中文 ' + file_count + '/'
 				+ options.all_file_count + '+ ' + path);
-		// CeL.info('for_text_file: Convert to hant: ' + path);
+		// CeL.info('for_text_file: Convert to 繁體中文: ' + path);
 		var contents = CeL.get_file(path);
 		return Promise.resolve().then(
 				CeL.CN_to_TW.bind(null, contents, convert_options))
@@ -174,7 +223,7 @@ function handle_files() {
 			// "zh-TW"
 			'"zh-cmn-Hant-TW"');
 			if (false) {
-				CeL.info('for_text_file: Converted to hant: ' + path + ', '
+				CeL.info('for_text_file: ' + '轉換 [' + path + '] 為繁體中文：'
 				//
 				+ contents.slice(0, 40) + '...');
 			}

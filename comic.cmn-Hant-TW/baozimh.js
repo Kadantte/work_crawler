@@ -1,5 +1,7 @@
 ﻿/**
- * 批量下載 咚漫中文官网 韓國漫畫 的工具。 Download dongmanmanhua comics.
+ * 批量下載包子漫畫的工具。 Download baozimh comics.
+ * 
+ * @since 2022/11/3 5:55:24
  */
 
 'use strict';
@@ -8,17 +10,12 @@ require('../work_crawler_loader.js');
 
 // ----------------------------------------------------------------------------
 
-CeL.run('application.net.work_crawler.sites.webtoon');
+CeL.run('application.net.work_crawler.sites.baozimh');
 
 // ----------------------------------------------------------------------------
 
-var crawler = CeL.webtoon({
-	// https://www.webtoons.com/zh-hans/
-	base_URL : 'https://www.dongmanmanhua.cn/',
-
-	// 解析 作品名稱 → 作品id get_work()
-	// 2018/7/25: search/autoComplete?keyword=
-	search_URL : 'search/autoComplete?keyword='
+var crawler = new CeL.baozimh({
+	base_URL : 'https://www.baozimh.com/'
 });
 
 // ----------------------------------------------------------------------------

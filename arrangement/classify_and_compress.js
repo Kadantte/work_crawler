@@ -32,6 +32,7 @@ var fso_name_list = CeL.read_directory(target_directory);
 
 if (!fso_name_list) {
 	CeL.error({
+		// gettext_config:{"id":"$2-the-target-directory-$1-does-not-exist"}
 		T : [ '%2: The target directory [%1] does not exist?',
 				target_directory, CeL.env.script_name ]
 	});
@@ -40,10 +41,13 @@ if (!fso_name_list) {
 
 // -----------------------------------------------------------------
 
-CeL.info({
-	T : [ '%3: %1: %2 files / directories to check.', target_directory,
-			fso_name_list.length, CeL.env.script_name ]
-});
+CeL
+		.info({
+			T : [
+					// gettext_config:{"id":"$3-$1-$2-files-directories-to-check"}
+					'%3: %1: %2 {{PLURAL:%2|file|files}} / {{PLURAL:%2|directory|directories}} to check.',
+					target_directory, fso_name_list.length, CeL.env.script_name ]
+		});
 
 // console.log(fso_name_list.slice(0, 3));
 
@@ -58,6 +62,10 @@ compress_each_directory.profiles = {
 		switches : '-mx=9 -r -sdel -sccUTF-8'
 	},
 	'game file' : {
+		file_type : '7z',
+		switches : '-mx=9 -r -sdel -sccUTF-8'
+	},
+	'sound folder' : {
 		file_type : '7z',
 		switches : '-mx=9 -r -sdel -sccUTF-8'
 	},
@@ -195,7 +203,7 @@ Object.keys(catalog_directory).forEach(function(catalog) {
 			main_catalog_directory + directory[sub_catalog]);
 			if (!CeL.directory_exists(sub_catalog_directory)) {
 				var message = CeL.gettext(
-				//
+				// gettext_config:{"id":"create-directory-of-sub-catalog-$1"}
 				'Create directory of sub-catalog [%1]:',
 				//
 				sub_catalog) + '	' + sub_catalog_directory;
@@ -209,6 +217,7 @@ Object.keys(catalog_directory).forEach(function(catalog) {
 		return;
 	} else if (catalog !== 'root') {
 		CeL.error({
+			// gettext_config:{"id":"invalid-catalog-$1"}
 			T : [ 'Invalid catalog: %1', catalog ]
 		});
 	}
@@ -237,8 +246,9 @@ function check_fso(fso_name) {
 		}
 
 		CeL.warn({
-			T : [ '因為最大的檔案有 %1 bytes，因此跳過這個%2的目錄：%3', biggest_file_size,
-					message, directory_path ]
+			// gettext_config:{"id":"because-the-largest-file-has-$1-bytes-skipping-this-$2-directory-$3"}
+			T : [ '因為最大的檔案有 %1 {{PLURAL:%1|位元組}}，因此跳過這個%2的目錄：%3',
+					biggest_file_size, message, directory_path ]
 		});
 	}
 
@@ -247,7 +257,8 @@ function check_fso(fso_name) {
 	fso_status = CeL.fso_status(directory_path);
 	if (!fso_status) {
 		CeL.error({
-			T : [ 'Can not read file / directory: %1', directory_path ]
+			// gettext_config:{"id":"cannot-read-file-directory-$1"}
+			T : [ 'Cannot read file / directory: %1', directory_path ]
 		});
 		return;
 	}
@@ -258,6 +269,7 @@ function check_fso(fso_name) {
 		if (false && PATTERN_executable_file.test(fso_name)) {
 			process_queue.push([ directory_path, 'game file',
 			// 為遊戲可執行檔或函式庫
+			// gettext_config:{"id":"it-is-a-executable-or-dll-file"}
 			CeL.gettext('為可執行檔或函式庫') ]);
 		} else
 			classify(fso_name, directory_path, fso_status);
@@ -269,20 +281,22 @@ function check_fso(fso_name) {
 	var sub_fso_list = CeL.read_directory(directory_path);
 	if (!sub_fso_list) {
 		CeL.error({
-			T : [ 'Can not read directory: %1', directory_path ]
+			// gettext_config:{"id":"cannot-read-directory-$1"}
+			T : [ 'Cannot read directory: %1', directory_path ]
 		});
 		return;
 	}
 	if (sub_fso_list.length === 0) {
 		if (!Object.values(catalog_directory).includes(directory_path))
 			CeL.warn({
+				// gettext_config:{"id":"empty-directory-$1"}
 				T : [ 'Empty directory: %1', directory_path ]
 			});
 		return;
 	}
 	// TODO: 這會漏掉只有空目錄的情況。
 
-	var image_count = 0, exe_count = 0, iso_count = 0, music_count = 0, anime_count = 0, archive_count = 0, _____padding_file_count = 0, non_zero_size_count = 0,
+	var image_count = 0, exe_count = 0, iso_count = 0, wav_count = 0, music_count = 0, anime_count = 0, archive_count = 0, _____padding_file_count = 0, non_zero_size_count = 0,
 	//
 	sub_files = [], sub_directories = [], sub_sub_files_count = 0,
 	// 最大的檔案size
@@ -295,13 +309,16 @@ function check_fso(fso_name) {
 				biggest_file_size = sub_fso_status.size;
 			non_zero_size_count++;
 		}
-		if (/\.(?:jpg|jpeg|webp|png|gif|bmp|ico|icon)$/i.test(sub_fso_name)) {
+		if (/\.(?:jpg|jpeg|webp|avif|png|gif|bmp|ico|icon)$/i
+				.test(sub_fso_name)) {
 			image_count++;
 		} else if (PATTERN_executable_file.test(sub_fso_name)) {
 			exe_count++;
-		} else if (/\.(?:cue|iso|mdf|mds|bin|ccd|sub)$/i.test(sub_fso_name)) {
+		} else if (/\.(?:iso|mdf|mds|bin|ccd|sub)$/i.test(sub_fso_name)) {
 			iso_count++;
 		} else if (/\.(?:cue|mp3|flac|ape|wav)$/i.test(sub_fso_name)) {
+			if (/\.(?:wav)$/i.test(sub_fso_name))
+				wav_count++;
 			music_count++;
 		} else if (/\.(?:avi|mp4|mkv|ass)$/i.test(sub_fso_name)) {
 			anime_count++;
@@ -356,6 +373,7 @@ function check_fso(fso_name) {
 		exe : exe_count,
 		iso : iso_count,
 		music : music_count,
+		wav : wav_count,
 		anime : anime_count,
 		zero_size : non_zero_size_count,
 		image : image_count,
@@ -378,7 +396,9 @@ function check_fso(fso_name) {
 	if ((exe_count > 0 && sub_sub_files_count - archive_count > 3
 			|| iso_count > 1 && sub_sub_files_count < 20 || iso_count === sub_sub_files_count)
 			&& test_size_OK(1e10, 'game folder', CeL.gettext(
-					'含有 %1/%2 個可執行檔或函式庫', exe_count, sub_sub_files_count))) {
+			// gettext_config:{"id":"contains-$1-$2-executable-files-or-libraries"}
+			'含有 %1/%2 個可執行{{PLURAL:%1|檔案}}或{{PLURAL:%1|函式庫}}', exe_count,
+					sub_sub_files_count))) {
 		return;
 	}
 
@@ -387,8 +407,10 @@ function check_fso(fso_name) {
 	: image_count > 2 && image_count > sub_sub_files_count - 2)) {
 		fso_status.maybe_image = true;
 		// 壓縮大多只有圖片的目錄。
-		if (test_size_OK(5e7, 'image folder', CeL.gettext('含有 %1/%2 張圖片',
-				image_count, sub_sub_files_count))) {
+		if (test_size_OK(5e7, 'image folder',
+		// gettext_config:{"id":"contains-$1-$2-images"}
+		CeL.gettext('含有 %1/%2 張{{PLURAL:%1|圖片}}', image_count,
+				sub_sub_files_count))) {
 			return;
 		}
 	}
@@ -403,13 +425,28 @@ function check_fso(fso_name) {
 		return sub_fso_name_list.some(function(name) {
 			return PATTERN_executable_file.test(name);
 		});
-	}) && test_size_OK(null, 'game folder', CeL.gettext('次目錄中含有可執行檔或函式庫'))) {
+	}) && test_size_OK(null, 'game folder',
+	// gettext_config:{"id":"subdirectory-contains-executable-files-or-libraries"}
+	CeL.gettext('次目錄中含有可執行檔或函式庫'))) {
 		return;
+	}
+
+	if (wav_count > 4 && wav_count / sub_sub_files_count > .3
+	// || wav_count > 8 && wav_count / sub_sub_files_count > .2
+	) {
+		fso_status.maybe_sound = true;
+		// 壓縮大多只有WAV音檔的目錄。
+		if (test_size_OK(1e10, 'sound folder', CeL
+				.gettext('含有 %1/%2 個{{PLURAL:%1|WAV音檔}}', wav_count,
+						sub_sub_files_count))) {
+			return;
+		}
 	}
 
 	if (image_count > 9 && image_count / sub_sub_files_count > .5) {
 		fso_status.maybe_image = true;
 		CeL.warn({
+			// gettext_config:{"id":"directory-to-be-checked-manually-$1"}
 			T : [ '需要手動檢查的目錄：%1', directory_path ]
 		});
 		// return;
@@ -435,9 +472,10 @@ function classify(fso_name, fso_path, fso_status, sub_fso_list) {
 			return;
 		}
 		move_to_path = CeL.next_fso_NO_unused(move_to_path + fso_name, true);
-		CeL.info(CeL.display_align([
-				[ CeL.gettext('Move %1: ', catalog), fso_path ],
-				[ '→ ', move_to_path ] ]));
+		CeL.info(CeL.display_align([ [ CeL.gettext.append_message_tail_space(
+		// gettext_config:{"id":"move-$1"}
+		'Move %1:', catalog), fso_path ], [ '→ ', move_to_path ] ]));
+		// gettext_config:{"id":"move-$1"}
 		add_log(CeL.gettext('Move %1:', catalog) + '	' + fso_path + '	→	'
 				+ move_to_path);
 		CeL.move_fso(fso_path, move_to_path);
@@ -479,13 +517,13 @@ function classify(fso_name, fso_path, fso_status, sub_fso_list) {
 		return;
 	}
 
-	if (/[\[(（【](?:18禁ゲーム|ACT|ADV|RPG|SLG|3D|PL\])/i.test(fso_name)
+	if (/[\[(（【](?:18禁ゲーム|ACT|ADV|RPG|SLG|3D|PL)\]/i.test(fso_name)
 			|| /パッケージ版|修正パッチ|予約特典|本編同梱|\+ ?update/i.test(fso_name)) {
 		move_to('game');
 		return;
 	}
 
-	if (/[\[(（【](?:ゲームCG|Game CG|HCG)/i.test(fso_name)) {
+	if (/[\[(（【](?:18禁ゲーム ?CG|(?:同人)?ゲームCG|Game CG|HCG)/i.test(fso_name)) {
 		move_to('game_CG');
 		return;
 	}
@@ -538,6 +576,13 @@ function classify(fso_name, fso_path, fso_status, sub_fso_list) {
 		return;
 	}
 
+	// [2021.11.17] TVアニメ「大正オトメ御伽話」EDテーマ「真心に奏」／土岐隼一 [FLAC 96kHz／24bit]
+	// [2021.11.17] 走れ！「バトルアスリーテス大運動会 ReSTART!」究極のキャラソンアルバム [FLAC]
+	if (/TVアニメ/.test(fso_name) && /\[FLAC/.test(fso_name)) {
+		move_to('anime_music');
+		return;
+	}
+
 	// ------------------------------------------
 
 	if (/\.(zip|rar|7z)$/.test(fso_name)
@@ -547,7 +592,7 @@ function classify(fso_name, fso_path, fso_status, sub_fso_list) {
 	}
 
 	matched = fso_name
-			.match(/\(([^()\[\]]+)\)(?: *[\[【](?:DL版|Digital|見本|ページ欠落)[\]】])*(?: *\(\d\))?\.(zip|rar|7z|cbz)$/);
+			.match(/\(([^()\[\]]+)\)(?: *[\[【](?:DL版|Digital|見本|ページ欠落|無修正)[\]】])*(?: *\(\d\))?\.(zip|rar|7z|cbz)$/);
 	if (matched) {
 		if (/^x\d{3,4}$/.test(matched[1])
 		// COMIC 阿吽, コミックマグナム
@@ -628,7 +673,9 @@ function classify(fso_name, fso_path, fso_status, sub_fso_list) {
 		return;
 	}
 
-	if (fso_status.counter.music > 0) {
+	if (fso_status.counter.music > 0
+			&& (fso_status.counter.music - fso_status.counter.wav)
+					/ fso_status.counter.sub_sub_files > .5) {
 		move_to('_maybe_music');
 		return;
 	}
@@ -658,11 +705,13 @@ Object.keys(catalog_directory).forEach(function(catalog) {
 	// 移除空的擬分類目錄/子分類目錄。
 	if (CeL.directory_is_empty(move_to_path)) {
 		CeL.log({
+			// gettext_config:{"id":"remove-empty-directory-$1"}
 			T : [ 'Remove empty directory: %1', move_to_path ]
 		});
 		CeL.remove_directory(move_to_path);
 	} else if (is_sub_catalog(catalog)) {
 		CeL.info({
+			// gettext_config:{"id":"directory-of-sub-catalog-$1-created-$2"}
 			T : [ 'Directory of sub-catalog [%1] created: %2',
 			//
 			catalog, move_to_path ]
@@ -673,8 +722,9 @@ Object.keys(catalog_directory).forEach(function(catalog) {
 // -----------------------------------------------------------------
 
 CeL.info({
-	T : [ '%2: %1 directories to compress.', process_queue.length,
-			CeL.env.script_name ]
+	// gettext_config:{"id":"$2-$1-directories-to-compress"}
+	T : [ '%2: %1 {{PLURAL:%1|directory|directories}} to compress.',
+			process_queue.length, CeL.env.script_name ]
 });
 
 // cache the path of p7z executable file
@@ -686,13 +736,17 @@ var p7zip_path = CeL.executable_file_path('7z')
 execSync = require('child_process').execSync;
 
 if (process_queue.length > 0) {
-	if (do_compress)
+	if (do_compress) {
 		process_queue.forEach(compress_each_directory);
-	else
+	} else {
 		CeL.info({
-			T : [ '因為未設定要壓縮 (do_compress)，有 %1 個檔案或資料夾沒有壓縮。',
-					process_queue.length ]
+			T : [
+			// gettext_config:{"id":"since-there-is-no-compression-(do_compress)-there-are-$1-files-or-folders-that-are-not-compressed"}
+			'因為未設定要壓縮（do_compress），有 %1 個{{PLURAL:%1|檔案}}或{{PLURAL:%1|目錄}}沒有壓縮。'
+			//
+			, process_queue.length ]
 		});
+	}
 }
 
 function escape_filename(filename) {
@@ -717,19 +771,23 @@ function compress_each_directory(config, index) {
 		profile_name = profile_name.profile;
 	}
 
+	// gettext_config:{"id":"$1-$2-compressing"}
 	process.title = CeL.gettext('%1/%2 compressing', index + 1,
 			process_queue.length);
 	CeL.info((index + 1) + '/' + process_queue.length + ' '
-			+ CeL.gettext('Compress') + ' ' + profile_name + ': ['
-			+ directory_path + '] ' + (message || '') + '...');
+	// gettext_config:{"id":"compress-$1"}
+	+ CeL.gettext('Compress %1:', profile_name) + ' [' + directory_path + '] '
+			+ (message || '') + '...');
 
 	if (CeL.fs_status(profile.archive)) {
 		CeL.error({
+			// gettext_config:{"id":"target-exists-$1"}
 			T : [ 'Target exists: %1', profile.archive ]
 		});
 		return;
 	}
 
+	// gettext_config:{"id":"compress-$1"}
 	add_log(CeL.gettext('Compress %1:', profile_name) + '	' + profile.archive);
 
 	var command = '"'

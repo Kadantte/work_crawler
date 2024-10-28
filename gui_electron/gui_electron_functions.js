@@ -14,17 +14,29 @@ var node_electron = require('electron'),
 base_directory = '../',
 // const. 主要以搜尋時使用的語言來區分，而非作品出產國。
 site_type_description = {
-	'comic.cmn-Hant-TW' : '繁體字漫畫',
-	'comic.cmn-Hans-CN' : '中国内地漫画',
-	'comic.ja-JP' : '日本語のウェブコミック',
-	'comic.en-US' : 'English webcomics',
-	'novel.cmn-Hans-CN' : '中国内地小说',
-	'novel.ja-JP' : '日本語のオンライン小説'
+	'comic.cmn-Hant-TW'
+	// gettext_config:{"id":"traditional-chinese-webcomics"}
+	: '繁體字漫畫',
+	'comic.cmn-Hans-CN'
+	// gettext_config:{"id":"simplified-chinese-webcomics"}
+	: '中国内地漫画',
+	'comic.ja-JP'
+	// gettext_config:{"id":"japanese-webcomics"}
+	: '日本語のウェブコミック',
+	'comic.en-US'
+	// gettext_config:{"id":"english-webcomics"}
+	: 'English webcomics',
+	'novel.cmn-Hans-CN'
+	// gettext_config:{"id":"simplified-chinese-web-fictions"}
+	: '中国内地小说',
+	'novel.ja-JP'
+	// gettext_config:{"id":"japanese-web-fictions"}
+	: '日本語のオンライン小説'
 },
 // const 縱使語言不同，也應該採用不同的 site id。否則檔案會存放到同一個目錄底下，可能造成檔案錯亂。
 download_sites_set = {
 	'comic.cmn-Hant-TW' : {
-		'999comics' : '99漫畫網',
+		// '999comics' : '99漫畫網',
 
 		manhuagui_tw : '繁體版漫畫櫃',
 
@@ -34,11 +46,13 @@ download_sites_set = {
 
 		dogemanga : '漫畫狗',
 
-		dmeden : '動漫伊甸園',
+		// dmeden : '動漫伊甸園',
 
 		'18comic' : '禁漫天堂',
 
-		comico : 'comico',
+		// baozimh : '包子漫畫',
+
+		// comico : 'comico',
 
 		webtoon : 'WEBTOON',
 
@@ -48,65 +62,74 @@ download_sites_set = {
 		qq : '腾讯漫画',
 		// '163' : '网易漫画',
 		u17 : '有妖气',
-		zymk : '知音漫客',
+		// zymk : '知音漫客',
 		dajiaochong : '大角虫漫画',
 		kuaikan : '快看漫画',
 		weibo : '微博动漫',
 		bilibili : '哔哩哔哩漫画',
-		buka : '布卡漫画',
+		// buka : '布卡漫画',
 		sfacg : 'SF漫画',
 
 		katui : '卡推漫画',
 		pufei : '扑飞漫画',
 		taduo : '塔多漫画',
 		'733dm' : '733动漫网',
-		'733mh' : '733漫画网',
+		// '733mh' : '733漫画网',
 		mh160 : '漫画160',
 		// nokiacn : '乙女漫画',
-		yinvmh : '乙女漫画',
-		iqg365 : '365漫画网',
-		emw : '一漫网',
-		aikanmh : '爱看漫画',
-		wuyouhui : '友绘漫画网',
-		'88bag' : '188漫画网',
+		// yinvmh : '乙女漫画',
+		// iqg365 : '365漫画网',
+		// emw : '一漫网',
+		// aikanmh : '爱看漫画',
+		// wuyouhui : '友绘漫画网',
+		// '88bag' : '188漫画网',
 		// '76' : '76漫画',
-		'517' : '我要去漫画',
-		dagu : '大古漫画网',
+		// '517' : '我要去漫画',
+		// dagu : '大古漫画网',
 		manhuadb : '漫画DB',
 		manhuacat : '漫画猫',
 
 		// '2manhua' : '爱漫画',
-		'57mh' : '57漫画网',
+		// '57mh' : '57漫画网',
 
 		dmzj : '动漫之家',
 		dm5 : '动漫屋',
 		'1kkk' : '漫画人',
 		// tohomh : '土豪漫画',
 		// ikmhw : '爱看漫画网',
-		r2hm : '无双漫画',
+		// r2hm : '无双漫画',
 		hanmanwo : '韩漫窝',
-		youma : '有码漫画',
+		// youma : '有码漫画',
 		mymhh : '梦游漫画',
 
 		// manhuatai : '漫画台',
 
 		manhuagui : '看漫画/漫画柜',
 		gufengmh : '古风漫画网',
-		duoduomh : '多多漫画',
-		'36mh' : '36漫画网',
+		'90mh' : '90漫画网',
+		// duoduomh : '多多漫画',
+		// '36mh' : '36漫画网',
 		manhuaniu : '漫画牛',
 		// mhkan: deprecated
 		// mhkan : '漫画看',
 		mh1234 : '漫画1234',
 		'930mh' : '亲亲漫画网',
-		'50mh' : '50漫画网',
+		// '50mh' : '50漫画网',
 
 		// omanhua : '哦漫画',
 
-		hhcool : '汗汗酷漫',
+		// hhcool : '汗汗酷漫',
+
+		qiman5 : '奇漫屋',
+
+		// baozimh_cn : '包子漫画',
+		'baozimh.org' : '包子漫畫.org',
 
 		// fed 系統
-		ohmanhua : 'Oh漫画',
+		// 2021/8/2 採用 Cloudflare 的阻斷服務攻擊保護
+		// ohmanhua : 'Oh漫画',
+
+		kanman : '看漫画',
 
 		migudm : '咪咕圈圈',
 
@@ -127,28 +150,29 @@ download_sites_set = {
 
 		moae : 'モアイ',
 
-		pixivcomic : 'pixivコミック',
+		// pixivcomic : 'pixivコミック',
 		// OVERLAP : 'OVERLAP',
 		// MAGCOMI : 'MAGCOMI',
 		cycomi : 'サイコミ',
 
-		// XOY : 'WEBTOON ja',
+	// XOY : 'WEBTOON ja',
 
-		comico_jp : 'コミコ',
-		comico_jp_plus : 'オトナ限定 コミコ'
+	// comico_jp : 'コミコ',
+	// comico_jp_plus : 'オトナ限定 コミコ'
 	},
 	'comic.en-US' : {
 		webtoon_en : 'WEBTOON en',
 
 		toomics_en : 'Toomics',
 
-	// 不再維護
-	// mangamew : 'Manga Mew',
-	// manganew : 'Manga New',
+		// 不再維護
+		// mangamew : 'Manga Mew',
+		// manganew : 'Manga New',
 
-	// Rocaca : [ 'rocaca (', {
-	// T : '不再維護'
-	// }, ')' ]
+		Rocaca : [ 'rocaca (', {
+			// gettext_config:{"id":"no-longer-maintained"}
+			T : '不再維護'
+		}, ')' ]
 
 	// mrblue : 'Mr.Blue'
 	},
@@ -158,25 +182,40 @@ download_sites_set = {
 		qidian : '起点中文网',
 
 		// PTCMS
-		'23us' : '顶点小说',
+		// '23us' : '顶点小说',
 		booktxt : '顶点小说 booktxt',
 		zwdu : '八一中文网',
 		x81zw : '新八一中文网',
 		'88dus' : '八八读书网',
 		'630book' : '恋上你看书网',
-		biquge : '笔趣阁',
+		biqizw : '比奇中文网',
+		ecxs : '烟草小说网',
+
+		// biquge : '笔趣阁',
+		biqugse : '笔趣阁',
+		xbiquke : '笔趣阁',
 		'xbiquge.cc' : '笔趣阁.cc',
-		xbiquge : '新笔趣阁',
+		'xbiquge.so' : '笔趣阁.so',
+		// xbiquge : '新笔趣阁',
 
 		// 杰奇小说连载系统
 		kanshushenzhan : '看书神站',
 		huaxiangju : '花香居',
 		zhuishubang : '追书帮',
 
+		xshuyaya : '丫丫电子书',
+
+		fxnzw : '飞翔鸟中文',
+
+		'69shu' : '69书吧',
+
+		cwjjj : '翠微居',
+
 		daocaoren : '稻草人书屋',
 		'51shucheng' : '无忧书城',
 		luoxia : '落霞小说网',
 		kanunu : '努努书坊',
+		quanben : '全本小说网',
 		piaotian : '飘天文学'
 	},
 	'novel.ja-JP' : {
@@ -224,7 +263,67 @@ theme_hash = {
 var DEFAULT_THEME_TEXT = 'default', default_theme_name;
 theme_list.push(DEFAULT_THEME_TEXT);
 
-'data_directory,recheck,start_chapter_NO,start_chapter_title,chapter_filter,regenerate,reget_chapter,search_again,cache_title_to_id,acceptable_types,archive_images,images_archive_extension,MAX_ERROR_RETRY,allow_EOI_error,MIN_LENGTH,timeout,skip_error,skip_chapter_data_error,one_by_one,chapter_time_interval,main_directory,vertical_writing,convert_to_language,user_agent,proxy,cookie,write_chapter_metadata,write_image_metadata,preserve_download_work_layer,play_finished_sound,archive_program_path'
+/**
+ * <code>
+
+ 增加選項的方法:
+ # 在 CeL.application.net.work_crawler.arguments 的 import_arg_hash 添加選項名稱與數據類型。
+ # 更改 work_crawler/gui_electron/gui_electron_functions.js 的 download_options_set（見下方）並加入說明資訊 "en":"","zh-hant":"" 。
+ // {"id":"download_options.","mark_type":"combination_message_id","en":"","zh-hant":""}
+
+ </code>
+ */
+
+// gettext_config:{"id":"download_options.recheck","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.show_information_only","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.start_chapter","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.start_chapter_no","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.chapter_no_range","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.start_chapter_title","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.start_list_serial","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.rearrange_list_file","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.regenerate","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.reget_chapter","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.search_again","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.cache_title_to_id","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.chapter_time_interval","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.chapter_filter","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.acceptable_types","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.archive_images","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.archive_all_good_images_only","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.remove_images_after_archive","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.images_archive_extension","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.max_error_retry","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.allow_eoi_error","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.min_length","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.timeout","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.skip_error","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.skip_chapter_data_error","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.directory_name_pattern","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.preserve_work_page","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.preserve_chapter_page","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.remove_ebook_directory","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.one_by_one","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.overwrite_old_file","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.convert_to_language","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.discard_old_ebook_file","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.hide_chapter_information","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.vertical_writing","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.main_directory","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.user_agent","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.proxy","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.cookie","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.write_chapter_metadata","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.write_image_metadata","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.archive_old_works","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.use_finished_date_to_archive_old_works","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.modify_work_list_when_archive_old_works","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.save_preference","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.data_directory","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.preserve_download_work_layer","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.play_finished_sound","mark_type":"combination_message_id"}
+// gettext_config:{"id":"download_options.archive_program_path","mark_type":"combination_message_id"}
+'data_directory,recheck,start_chapter_NO,chapter_NO_range,start_chapter_title,chapter_filter,regenerate,reget_chapter,search_again,cache_title_to_id,acceptable_types,archive_images,images_archive_extension,MAX_ERROR_RETRY,allow_EOI_error,MIN_LENGTH,timeout,skip_error,skip_chapter_data_error,directory_name_pattern,one_by_one,chapter_time_interval,main_directory,hide_chapter_information,vertical_writing,convert_to_language,user_agent,proxy,cookie,write_chapter_metadata,write_image_metadata,preserve_download_work_layer,play_finished_sound,archive_program_path'
 // @see work_crawler/resource/locale of work_crawler - locale.csv
 .split(',').forEach(function(item) {
 	download_options_set[item] = 'download_options.' + item;
@@ -254,22 +353,26 @@ var _;
 // 設定國際性語言 language force convert. @see setup_language_menu()
 var force_convert = [ 'en' ];
 
-// @see setup_language_menu()
-// for i18n: define gettext() user domain resources location.
-// gettext() will auto load (CeL.env.domain_location + language + '.js').
-// e.g., resources/cmn-Hant-TW.js, resources/ja-JP.js
-CeL.env.domain_location = function() {
-	is_installation_package = CeL.is_installation_package();
+// 2022/4/20 18:31:47 採用單一語系檔，轉移至系統語系檔: CeJS/application/locale/resources/*.js
+// 現在此處僅提供一個使用範例。
+if (false) {
+	// @see setup_language_menu()
+	// for i18n: define gettext() user domain resources location.
+	// gettext() will auto load (CeL.env.domain_location + language + '.js').
+	// e.g., resources/cmn-Hant-TW.js, resources/ja-JP.js
+	CeL.env.domain_location = function() {
+		is_installation_package = CeL.is_installation_package();
 
-	return CeL.env.domain_location
-	// CeL.env.script_base_path: 形如 ...'/work_crawler/gui_electron/'
-	= CeL.env.script_base_path.replace(/gui_electron[\\\/]$/, '')
-	// resources/
-	+ CeL.env.resources_directory_name + '/';
-	// 在安裝包中， `process.cwd()` 可能為
-	// C:\Users\user\AppData\Local\Programs\work_crawler
+		return CeL.env.domain_location
+		// CeL.env.script_base_path: 形如 ...'/work_crawler/gui_electron/'
+		= CeL.env.script_base_path.replace(/gui_electron[\\\/]$/, '')
+		// resources/
+		+ CeL.env.resources_directory_name + '/';
+		// 在安裝包中， `process.cwd()` 可能為
+		// C:\Users\user\AppData\Local\Programs\work_crawler
 // 因此 CeL.env.domain_location 必須提供完整路徑。
-};
+	};
+}
 
 CeL.run([ 'application.debug.log', 'interact.DOM' ], initializer);
 
@@ -281,7 +384,10 @@ function check_max_logs() {
 	CeL.set_class(this, 'disabled', {
 		remove : show
 	});
-	this.innerHTML = _(CeL.DOM_data(this).gettext = show ? '限制訊息行數' : '不限制訊息行數');
+	// gettext_config:{"id":"limit-log-lines"}
+	this.innerHTML = _(CeL.DOM_data(this).gettext = show ? '限制訊息行數'
+	// gettext_config:{"id":"do-not-limit-log-lines"}
+	: '不限制訊息行數');
 	// .children[0] (<span>) === .firstElementChild
 	// !== .firstChild (maybe #text)
 	CeL.node_value(this.parentNode.children[0], show ? '✂️' : '');
@@ -381,6 +487,7 @@ function initializer() {
 		});
 	}
 
+	// gettext_config:{"id":"cejs-online-novels-comics-downloader"}
 	process.title = _('CeJS 網路小說漫畫下載工具');
 
 	// --------------------------------
@@ -393,12 +500,18 @@ function initializer() {
 // ------------------------------------
 
 function on_menu_changed() {
-	if (+_('untranslated message count') > 0) {
+	// gettext_config:{"id":"untranslated-message-count"}
+	if (_('untranslated message count') != 0) {
+		// CeL.gettext.get_alias(CeL.gettext.default_domain)
+		// gettext_config:{"id":"local-language-name"}
+		var language_name = _('local-language-name');
+		if (language_name === 'local-language-name')
+			language_name = CeL.gettext.get_domain_name();
 		CeL.info({
+			// gettext_config:{"id":"there-are-currently-$1-$2-messages-that-have-not-been-translated.-welcome-to-translate-with-us"}
 			T : [ '現有%1條%2訊息尚未翻譯，歡迎您一同參與翻譯訊息！',
-					_('untranslated message count'),
-					// CeL.gettext.get_alias(CeL.gettext.default_domain)
-					_('using language') ]
+			// gettext_config:{"id":"untranslated-message-count"}
+			_('untranslated message count'), language_name ]
 		});
 	}
 }
@@ -406,9 +519,9 @@ function on_menu_changed() {
 function setup_language_menu() {
 	_ = CeL.gettext;
 
-	_.create_menu('language_menu', [ 'TW', 'CN', 'ja', 'en', 'pt', 'ko' ],
+	_.create_menu('language_menu',
 	// 預設介面語言繁體中文+...
-	on_menu_changed);
+	[ 'TW', 'CN', 'ja', 'en', 'fr', 'pt', 'pms', 'ko' ], on_menu_changed);
 
 	// translate all nodes to show in specified language (or default domain).
 	_.translate_nodes();
@@ -434,9 +547,11 @@ function setup_initial_messages() {
 	}, 'max_logs');
 
 	CeL.debug({
+		// gettext_config:{"id":"working-directory-$1"}
 		T : [ 'Working directory: %1', CeL.storage.working_directory() ]
 	}, 1);
 	CeL.debug({
+		// gettext_config:{"id":"environment-variables-$1"}
 		T : [ '所有環境變數：%1', JSON.stringify(process.env) ]
 	}, 1);
 
@@ -444,27 +559,33 @@ function setup_initial_messages() {
 
 	CeL.info({
 		// Default download location
+		// gettext_config:{"id":"default-download-directory-$1"}
 		T : [ 'Default download directory: %1', data_directory ]
 	});
 
 	// --------------------------------
 
 	CeL.info({
-		// 🚧 https://weblate.org/zh-hant/
-		span : [ {
-			T : '歡迎與我們一同翻譯介面文字！#1',
-			force_convert : force_convert
-		}, {
-			a : {
-				T : '歡迎與我們一同翻譯介面文字！#2',
-				force_convert : force_convert
-			},
-			href : 'https://github.com/kanasimi/work_crawler/issues/185',
-			onclick : open_URL
-		}, {
-			T : '歡迎與我們一同翻譯介面文字！#3',
-			force_convert : force_convert
-		} ]
+		// gettext_config:{"id":"let-s-<a>translate-the-interface<-a>-together"}
+		T : '歡迎與我們一同<a>翻譯介面文字</a>！',
+		on_language_changed : function(conversion) {
+			conversion = CeL.gettext.apply(this, conversion);
+			var matched = conversion
+					.match(/^([\s\S]*?)<a>([\s\S]*?)<\/a>([\s\S]*?)$/);
+			if (matched) {
+				conversion = {
+					// 🚧 https://weblate.org/zh-hant/
+					span : [ matched[1], {
+						a : matched[2],
+						href :
+						//
+						'https://github.com/kanasimi/work_crawler/issues/185',
+						onclick : open_URL
+					}, matched[3] ]
+				};
+			}
+			CeL.new_node(conversion, [ this, null ]);
+		}
 	});
 	on_menu_changed();
 
@@ -473,6 +594,7 @@ function setup_initial_messages() {
 	if (CeL.platform.is_Windows()) {
 		CeL.new_node([ {
 			a : {
+				// gettext_config:{"id":"copy-and-paste-shortcuts"}
 				T : '複製貼上快速鍵'
 			},
 			href : 'https://en.wikipedia.org/wiki/'
@@ -480,6 +602,7 @@ function setup_initial_messages() {
 			+ 'Cut,_copy,_and_paste#Common_keyboard_shortcuts',
 			onclick : open_URL
 		}, ' - ', {
+			// gettext_config:{"id":"copy-selected-items"}
 			T : '複製選取的項目：'
 		}, {
 			kbd : 'Ctrl+C'
@@ -487,7 +610,8 @@ function setup_initial_messages() {
 			span : ' | ',
 			S : "color: blue;"
 		}, {
-			T : '貼上項目：'
+			// gettext_config:{"id":"paste"}
+			T : '貼上：'
 		}, {
 			kbd : 'Ctrl+V'
 		} ], 'small_tips');
@@ -525,6 +649,7 @@ function select_theme(theme, no_save) {
 	}
 	if (!theme_list.includes(theme)) {
 		CeL.warn([ 'select_theme: ', {
+			// gettext_config:{"id":"invalid-theme-name-$1"}
 			T : [ 'Invalid theme name: %1', theme ]
 		} ]);
 		return;
@@ -556,6 +681,7 @@ function setup_theme_selecter() {
 	}
 
 	var theme_nodes = [ {
+		// gettext_config:{"id":"theme"}
 		T : '布景主題：'
 	} ];
 	theme_list.forEach(function(theme_name) {
@@ -564,6 +690,9 @@ function setup_theme_selecter() {
 		? default_theme_name : theme_name;
 		theme_nodes.push({
 			span : [ theme_hash[_theme_name] || '', {
+				// gettext_config:{"id":"light-theme","mark_type":"combination_message_id"}
+				// gettext_config:{"id":"dark-theme","mark_type":"combination_message_id"}
+				// gettext_config:{"id":"default-theme","mark_type":"combination_message_id"}
 				T : theme_name + ' theme',
 				force_convert : force_convert
 			} ],
@@ -575,7 +704,7 @@ function setup_theme_selecter() {
 		});
 	});
 	CeL.new_node(theme_nodes, 'select_theme_panel');
-	// free
+	// Release memory. 釋放被占用的記憶體。
 	theme_nodes = null;
 
 	// auto-detect navigator theme
@@ -702,6 +831,7 @@ function setup_download_options() {
 						T : '📂',
 						R : (old_Unicode_support ? '' : '🗁 ')
 						// append dialog
+						// gettext_config:{"id":"select-$1-path"}
 						+ _('選擇%1路徑', _(fso_type)),
 						fso_type : fso_type,
 						onclick : select_download_options_fso,
@@ -740,20 +870,23 @@ function setup_download_options() {
 			true));
 	set_click_trigger('download_options_trigger', CeL.new_node({
 		div : [ options_nodes, {
-			b : [ '📥', {
-				// 本次執行期間不儲存選項設定
-				T : '自動儲存選項設定與最愛作品清單#1',
-				force_convert : force_convert
-			}, external_favorite_list ? {
-				T : '自動儲存選項設定與最愛作品清單#2',
+			b : [ '📥', external_favorite_list ? {
+				// gettext_config:{"id":"auto-save-download-options-and-favorite-series-list"}
+				T : '自動儲存選項設定與最愛作品清單',
 				force_convert : force_convert,
 				S : 'color: orange;'
-			} : '' ],
+			} : {
+				// 本次執行期間不儲存選項設定
+				// gettext_config:{"id":"auto-save-download-options"}
+				T : '自動儲存選項設定',
+				force_convert : force_convert
+			} ],
 			onclick : function() {
 				save_config_this_time = !save_config_this_time;
 				CeL.info({
+					// gettext_config:{"id":"automatic-storage-setting-has-been-enabled"}
 					T : save_config_this_time ? '已設定自動儲存選項設定。'
-					//
+					// gettext_config:{"id":"automatic-storage-setting-has-been-disabled"}
 					: '已設定不自動儲存選項設定。'
 				});
 				CeL.set_class(this, 'not_set', {
@@ -762,12 +895,14 @@ function setup_download_options() {
 			},
 			C : 'button' + (save_config_this_time ? '' : ' ' + 'not_set')
 		}, {
-			b : [ '🔙', {
-				T : '重設下載選項與最愛作品清單#1'
-			}, external_favorite_list ? {
-				T : '重設下載選項與最愛作品清單#2',
+			b : [ '🔙', external_favorite_list ? {
+				// gettext_config:{"id":"reset-download-options-and-favorite-series-list"}
+				T : '重設下載選項與最愛作品清單',
 				S : 'color: orange;'
-			} : '' ],
+			} : {
+				// gettext_config:{"id":"reset-download-options"}
+				T : '重設下載選項'
+			} ],
 			onclick : click_reset_download_option,
 			C : 'button'
 		} ]
@@ -881,6 +1016,7 @@ function select_download_options_fso() {
 				|| !Array.isArray(fso_path_list = fso_path_list.filePaths)) {
 			// assert: fso_path_list === null
 			CeL.log({
+				// gettext_config:{"id":"no-file-or-directory-selected"}
 				T : '未選擇檔案或目錄。'
 			});
 			return;
@@ -889,9 +1025,12 @@ function select_download_options_fso() {
 		// assert: Array.isArray(fso_path_list)
 		if (!fso_type.startsWith('file')) {
 			// assert: 選擇目錄。自動加上最後的目錄分隔符號。
-			fso_path_list = fso_path_list.map(CeL.append_path_separator);
+			fso_path_list = fso_path_list.map(function(fso_path) {
+				return CeL.append_path_separator(fso_path);
+			});
 		}
 		CeL.log([ 'select_download_options_fso: ', {
+			// gettext_config:{"id":"path-of-$2-selected-$1"}
 			T : [ '選擇了%2的路徑：%1', JSON.stringify(fso_path_list), fso_type ]
 		} ]);
 
@@ -945,6 +1084,7 @@ function click_reset_download_option() {
 
 	save_preference(crawler);
 	reset_site_options();
+	// gettext_config:{"id":"download-options-reset"}
 	CeL.info('已重設下載選項。');
 }
 
@@ -1067,7 +1207,10 @@ function set_trigger_icon(options) {
 	var expand_now = options.display !== 'none';
 	var icon_text = expand_now ? '📖' : '📕';
 	// click to expand
-	var icon_title = _(expand_now ? 'collapse' : 'expand');
+	// gettext_config:{"id":"collapse"}
+	var icon_title = _(expand_now ? 'collapse'
+	// gettext_config:{"id":"expand"}
+	: 'expand');
 	if (icon_node) {
 		icon_node.title = icon_title;
 		CeL.DOM.set_text(icon_node, icon_text);
@@ -1147,6 +1290,7 @@ function change_data_directory(data_directory) {
 				var new_main_directory = this.main_directory.replace(
 						old_data_directory, data_directory);
 				CeL.info({
+					// gettext_config:{"id":"updating-and-setting-up-download-website-for-$1-$2-→-$3"}
 					T : [ '同時更改已手動設定下載目錄的網站 %1：%2 → %3', site_id,
 							this.main_directory, new_main_directory ]
 				});
@@ -1156,6 +1300,7 @@ function change_data_directory(data_directory) {
 
 		if (CeL.directory_is_empty(old_data_directory)) {
 			CeL.warn({
+				// gettext_config:{"id":"the-old-download-directory-$1-is-an-empty-directory-so-it-will-be-removed"}
 				T : [ '舊下載目錄 "%1" 為空目錄，將之移除。', old_data_directory ]
 			});
 			CeL.remove_directory(old_data_directory);
@@ -1176,6 +1321,7 @@ function change_data_directory(data_directory) {
 function save_default_configuration() {
 	if (!save_config_this_time) {
 		CeL.debug([ 'save_default_configuration: ', {
+			// gettext_config:{"id":"automatic-storage-setting-has-been-disabled"}
 			T : '已設定不自動儲存選項設定。'
 		} ], 1);
 		return;
@@ -1199,13 +1345,16 @@ function save_default_configuration() {
 function save_preference(crawler) {
 	if (!save_config_this_time) {
 		CeL.debug([ 'save_preference: ', {
+			// gettext_config:{"id":"automatic-storage-setting-has-been-disabled"}
 			T : '已設定不自動儲存選項設定。'
 		} ], 1);
 		return;
 	}
 
 	// prepare work directory.
-	CeL.create_directory(crawler.main_directory);
+	CeL.create_directory(crawler.main_directory, {
+		no_throw : true
+	});
 
 	var preference = crawler.preference;
 	if (get_favorite_list_file_path(crawler)) {
@@ -1223,20 +1372,24 @@ function check_favorites_line_separator(favorites) {
 	//
 	|| favorites.line_separator === CeL.env.line_separator ? '' : [ ' ', {
 		// 分行
-		T : [ '檔案換行為 %1，和系統換行 %2 不符。',
+		// gettext_config:{"id":"file-new-line-$1-which-does-not-match-the-system-new-line-$2"}
+		T : [ '檔案換行%1和系統換行%2不符。',
 		//
 		JSON.stringify(favorites.line_separator),
 		//
 		JSON.stringify(CeL.env.line_separator) ]
 	}, {
+		// gettext_config:{"id":"there-may-be-garbled-characters-when-opening-the-file"}
 		T : '開啟檔案時可能會有亂碼。'
 	}, {
 		b : {
+			// gettext_config:{"id":"one-click-fix-file-wrap"}
 			T : '一鍵修正檔案換行'
 		},
 		onclick : function() {
 			favorites.line_separator = CeL.env.line_separator;
 			// save_favorites(crawler, favorites.toString());
+			// gettext_config:{"id":"modified-file-wrap.-you-must-save-a-list-of-favorite-works-to-take-effect"}
 			this.innerHTML = _('已修改檔案換行。您必須儲存最愛作品清單才能生效。');
 		},
 		C : 'favorites_button'
@@ -1278,6 +1431,7 @@ function edit_favorites(crawler) {
 
 	CeL.new_node([ {
 		div : {
+			// gettext_config:{"id":"enter-one-series-title-or-id-per-line"}
 			T : '請在每一行鍵入一個作品名稱或🆔：'
 		}
 	}, favorites_node, {
@@ -1286,6 +1440,7 @@ function edit_favorites(crawler) {
 		div : [ {
 			// save
 			b : [ '💾', {
+				// gettext_config:{"id":"save-favorite-series-list"}
 				T : '儲存最愛作品清單'
 			}, ' (', {
 				kbd : 'Ctrl'
@@ -1297,6 +1452,7 @@ function edit_favorites(crawler) {
 		}, {
 			// abandon
 			b : [ old_Unicode_support ? '❌' : '🛑', {
+				// gettext_config:{"id":"discard-editing-favorite-series-list"}
 				T : '放棄編輯最愛作品清單'
 			}, ' (', {
 				kbd : 'Escape'
@@ -1329,7 +1485,7 @@ function get_favorite_list_file_path(crawler) {
 }
 
 function favorites_toString(favorites) {
-	return favorites.hasOwnProperty('toString')
+	return Object.hasOwn(favorites, 'toString')
 	//
 	? favorites.toString() : favorites.join('\n');
 }
@@ -1377,6 +1533,7 @@ function get_favorites(crawler, get_parsed, remove_list) {
 	work_list = crawler.preference.favorites;
 	if (Array.isArray(work_list) && work_list.length > 0) {
 		CeL.info({
+			// gettext_config:{"id":"favorite-series-list-not-found-or-empty.-using-old-favorite-series-list"}
 			T : '儲存最愛作品清單的檔案不存在或者沒有內容。採用舊有的最愛作品列表。'
 		});
 		return work_list;
@@ -1481,7 +1638,9 @@ function reset_favorites(crawler) {
 				if (CeL.directory_exists(work_directory)) {
 					nodes.push({
 						span : '📂',
-						R : (old_Unicode_support ? '' : '🗁 ') + _('開啓作品下載目錄'),
+						R : (old_Unicode_support ? '' : '🗁 ')
+						// gettext_config:{"id":"open-download-folder"}
+						+ _('開啓作品下載目錄'),
 						onclick : function() {
 							show_fso(work_directory);
 						},
@@ -1497,6 +1656,7 @@ function reset_favorites(crawler) {
 					if (crawler.is_finished(work_data)) {
 						nodes.push({
 							span : '👌',
+							// gettext_config:{"id":"series-has-ended"}
 							R : _('作品已完結。')
 							//
 							+ (work_data.last_update ? '\nlast_update: '
@@ -1531,6 +1691,7 @@ function reset_favorites(crawler) {
 		nodes.push({
 			b : '✗',
 			// 從最愛名單中刪除本作品。
+			// gettext_config:{"id":"remove-series-from-favorite-series-list"}
 			R : _('從最愛名單中注解掉本作品。'),
 			onclick : function() {
 				remove_favorite(crawler, input_id ? work_id : work_title);
@@ -1547,6 +1708,7 @@ function reset_favorites(crawler) {
 
 	if (finished_work_title_list.length > 0) {
 		CeL.info({
+			// gettext_config:{"id":"$1-ended-series-or-id-$2"}
 			T : [ '%1 已完結的作品名稱或🆔：%2', crawler.site_name || crawler.site_id,
 					finished_work_title_list.join(', ') ]
 		});
@@ -1575,6 +1737,7 @@ function reset_favorites(crawler) {
 	} : '', {
 		div : [ favorites.length > 0 ? {
 			b : [ '✅', {
+				// gettext_config:{"id":"check-and-download-updates-of-all-favorite-series"}
 				T : '檢查所有最愛作品之更新，並下載更新作品。'
 			} ],
 			onclick : function() {
@@ -1586,12 +1749,15 @@ function reset_favorites(crawler) {
 		} : favorites.comments > 0 || favorites.blank > 0
 		//
 		|| favorites.duplicated > 0 ? {
+			// gettext_config:{"id":"there-is-no-favorite-series-list"}
 			T : '🈳 尚無最愛作品。'
 		} : {
+			// gettext_config:{"id":"favorite-series-list-is-empty"}
 			T : '🈳 尚未設定最愛作品。'
 		}, {
 			// 📝 我的最愛
 			b : [ '✍️', {
+				// gettext_config:{"id":"edit-favorite-series-list"}
 				T : '編輯最愛作品清單'
 			} ],
 			onclick : function() {
@@ -1603,9 +1769,11 @@ function reset_favorites(crawler) {
 		|| favorites.duplicated > 0 ? {
 			// abandon
 			b : [ old_Unicode_support ? '❌' : '🛑', {
-				T : [ '刪除所有%1個注解、%2個重複與%3個空白行。',
+				T : [
+				// gettext_config:{"id":"delete-all-$1-annotations-$2-repetitions-and-$3-blank-lines"}
+				'刪除所有 %1 個{{PLURAL:%1|註解}}、%2 個{{PLURAL:%2|重複作品名稱}}與 %3 個{{PLURAL:%3|空行}}。'
 				//
-				favorites.comments, favorites.duplicated, favorites.blank ]
+				, favorites.comments, favorites.duplicated, favorites.blank ]
 			} ],
 			onclick : function() {
 				save_favorites(crawler, crawler.preference
@@ -1615,11 +1783,13 @@ function reset_favorites(crawler) {
 			},
 			C : 'favorites_button cancel'
 		} : '', favorites.duplicated > 0 ? [ ' ', {
-			T : [ '列表檔案中有%1個重複作品名稱或 id。', favorites.duplicated ]
+			// gettext_config:{"id":"there-are-$1-duplicate-titles-or-ids-in-the-list"}
+			T : [ '列表檔案中有 %1 個重複作品名稱或🆔。', favorites.duplicated ]
 		}, {
 			// 我的最愛
 			b : [ '🔨', {
 				// 重新整理列表檔案
+				// gettext_config:{"id":"annotate-duplicate-work-names-or-id"}
 				T : '注解掉重複的作品名稱或🆔',
 			} ],
 			onclick : function() {
@@ -1632,6 +1802,7 @@ function reset_favorites(crawler) {
 		}, {
 			// 我的最愛
 			b : [ '❌', {
+				// gettext_config:{"id":"delete-duplicate-work-names-or-id"}
 				T : '刪除重複的作品名稱或🆔'
 			} ],
 			onclick : function() {
@@ -1646,6 +1817,7 @@ function reset_favorites(crawler) {
 			C : 'favorites_button'
 		} ] : '', finished_work_title_list.length > 0 ? {
 			b : [ '❌', {
+				// gettext_config:{"id":"commented-out-$1-finished-work-names-or-id"}
 				T : [ '注解掉%1個已完結的作品名稱或🆔', finished_work_title_list.length ]
 			} ],
 			onclick : function() {
@@ -1660,8 +1832,10 @@ function reset_favorites(crawler) {
 	//
 	|| crawler.read_work_data ? '' : [ {
 		b : [ '⌛️', {
-			T : '讀取本網站作品資訊檔案以判別作品是否已下載過、是否完結。'
+			// gettext_config:{"id":"reading-the-website-information-file-of-this-website-to-determine-whether-the-work-has-been-downloaded-and-completed"}
+			T : '讀取本網站各作品之資訊檔案，以判別作品是否已下載過、是否完結。'
 		}, {
+			// gettext_config:{"id":"when-choosing-a-website-it-can-cause-few-seconds-of-unresponsiveness"}
 			T : '選擇網站時，這可能造成幾十秒鐘無回應。',
 			S : 'color: red;'
 		} ],
@@ -1672,6 +1846,7 @@ function reset_favorites(crawler) {
 		C : 'favorites_button'
 	}, {
 		b : [ '⌛️', {
+			// gettext_config:{"id":"reading-the-work-information-from-all-websites"}
 			T : '讀取所有網站之作品資訊檔案',
 			S : 'color: red;'
 		} ],
@@ -1756,7 +1931,8 @@ function prepare_crawler(crawler, crawler_module) {
 	if (default_configuration[site_id]) {
 		// e.g., crawler.main_directory
 		CeL.info({
-			T : [ 'import configuration of %1: %2', site_id,
+			// gettext_config:{"id":"imported-configuration-of-$1-$2"}
+			T : [ 'Imported configuration of %1: %2', site_id,
 					JSON.stringify(default_configuration[site_id]) ]
 		});
 		Object.assign(crawler, default_configuration[site_id]);
@@ -1777,7 +1953,8 @@ function prepare_crawler(crawler, crawler_module) {
 		crawler.default_save_to_preference[key] = crawler[key];
 		if (key in crawler_configuration) {
 			CeL.info({
-				T : [ 'import preference of %1: %2', site_id,
+				// gettext_config:{"id":"imported-preference-of-$1-$2"}
+				T : [ 'Imported preference of %1: %2', site_id,
 				//
 				key + '=' + crawler_configuration[key] + '←' + crawler[key] ]
 			});
@@ -1794,8 +1971,10 @@ function prepare_crawler(crawler, crawler_module) {
 	CeL.new_node([ ' ', {
 		a : [ '🔗', {
 			// 作品平臺連結 (略稱)
+			// gettext_config:{"id":"link"}
 			T : '連結'
 		} ],
+		// gettext_config:{"id":"link"}
 		R : _('連結'),
 		href : crawler.base_URL,
 		onclick : open_URL
@@ -1810,7 +1989,9 @@ setup_crawler.prepare = prepare_crawler;
 var search_result_columns = {
 	No : null,
 
-	網站 : function(crawler, work_data, work_title) {
+	// gettext_config:{"id":"work_crawler-search_result_columns-site"}
+	'work_crawler-search_result_columns-site' : function(crawler, work_data,
+			work_title) {
 		return {
 			b : crawler.site_name ? {
 				span : crawler.site_name
@@ -1823,7 +2004,10 @@ var search_result_columns = {
 		};
 	},
 
-	標題 : [ '僅於所獲得之作品標題特殊，不同於所查詢之作品標題時，才會標示。',
+	// gettext_config:{"id":"work_crawler-search_result_columns-title"}
+	'work_crawler-search_result_columns-title' : [
+	// gettext_config:{"id":"only-if-the-title-of-the-obtained-work-is-special-and-different-from-the-title-of-the-work-in-question-will-it-be-marked"}
+	'僅於所獲得之作品標題特殊，不同於所查詢之作品標題時，才會標示。',
 	//
 	function(crawler, work_data, work_title) {
 		return work_data.title && work_data.title.trim() === work_title.trim()
@@ -1831,13 +2015,17 @@ var search_result_columns = {
 		? '' : work_data.title;
 	} ],
 
-	作者 : function(crawler, work_data) {
+	// gettext_config:{"id":"work_crawler-search_result_columns-author"}
+	'work_crawler-search_result_columns-author' : function(crawler, work_data) {
 		return {
 			small : work_data.author
 		};
 	},
 
-	最愛 : [ '😘: 在最愛清單中, ➕: 加入最愛清單', function(crawler, work_data) {
+	// gettext_config:{"id":"work_crawler-search_result_columns-favorite"}
+	'work_crawler-search_result_columns-favorite' : [
+	// gettext_config:{"id":"work_crawler-favorite_list_label"}
+	'work_crawler-favorite_list_label', function(crawler, work_data) {
 		var favorite_list = get_favorites(crawler);
 		// ✓
 		return favorite_list.includes(work_data.title) ? '😘' : {
@@ -1857,12 +2045,18 @@ var search_result_columns = {
 		};
 	} ],
 
-	話數 : [ '章節數量', function(crawler, work_data) {
+	// gettext_config:{"id":"work_crawler-search_result_columns-chapters"}
+	'work_crawler-search_result_columns-chapters' : [
+	// gettext_config:{"id":"number-of-chapters"}
+	'章節數量', function(crawler, work_data) {
 		this.S = 'text-align: right;';
 		return work_data.chapter_count;
 	} ],
 
-	曾下載 : [ '當之前下載過時，標示上次下載到第幾章節。', function(crawler, work_data) {
+	// gettext_config:{"id":"work_crawler-search_result_columns-once-downloaded"}
+	'work_crawler-search_result_columns-once-downloaded' : [
+	// gettext_config:{"id":"mark-the-last-chapter-you-downloaded"}
+	'當之前下載過時，標示上次下載到第幾章節。', function(crawler, work_data) {
 		this.title = crawler.site_id;
 		return work_data.last_download
 		//
@@ -1874,7 +2068,9 @@ var search_result_columns = {
 			=== work_data.chapter_count ? '' : 'different',
 		}, {
 			span : '📂',
-			R : (old_Unicode_support ? '' : '🗁 ') + _('開啓作品下載目錄'),
+			R : (old_Unicode_support ? '' : '🗁 ')
+			// gettext_config:{"id":"open-download-folder"}
+			+ _('開啓作品下載目錄'),
 			onclick : function() {
 				// var work_data =
 				// work_data_search_queue[this.parentNode.title];
@@ -1885,16 +2081,25 @@ var search_result_columns = {
 		} ] : '';
 	} ],
 
-	限 : [ '部份章節需要付費/被鎖住/被限制', function(crawler, work_data) {
+	// gettext_config:{"id":"work_crawler-search_result_columns-restricted"}
+	'work_crawler-search_result_columns-restricted' : [
+	// gettext_config:{"id":"some-chapters-need-to-be-paid-locked-restricted"}
+	'部份章節須付費／已鎖定／受限', function(crawler, work_data) {
 		// 💰
 		return work_data.some_limited ? '🔒' : '';
 	} ],
 
-	完 : [ '作品已完結。', function(crawler, work_data) {
+	// gettext_config:{"id":"work_crawler-search_result_columns-completed"}
+	'work_crawler-search_result_columns-completed' : [
+	// gettext_config:{"id":"series-has-ended"}
+	'作品已完結。', function(crawler, work_data) {
 		return crawler.is_finished(work_data) ? '👌' : '';
 	} ],
 
-	狀況 : [ '作品狀況', function(crawler, work_data) {
+	// gettext_config:{"id":"work_crawler-search_result_columns-status"}
+	'work_crawler-search_result_columns-status' : [
+	// gettext_config:{"id":"status-of-work"}
+	'作品狀況', function(crawler, work_data) {
 		var status = work_data.status,
 		//
 		href = crawler.full_URL(crawler.work_URL, work_data.id);
@@ -1917,13 +2122,17 @@ var search_result_columns = {
 		};
 	} ],
 
-	最新 : [ '最新章節', function(crawler, work_data) {
+	// gettext_config:{"id":"work_crawler-search_result_columns-lastest"}
+	'work_crawler-search_result_columns-lastest' : [
+	// gettext_config:{"id":"lastest-chapter"}
+	'最新章節', function(crawler, work_data) {
 		var node = work_data.latest_chapter && work_data.latest_chapter
 		// 不需包含作品標題
 		.replace(work_data.title, '');
 		if (node && work_data.fill_from_chapter_list)
 			node = [ {
 				span : old_Unicode_support ? '' : '🧩',
+				// gettext_config:{"id":"information-from-the-list-of-chapters"}
 				R : _('資訊來自章節清單')
 			}, node ];
 		else
@@ -1999,17 +2208,20 @@ function show_search_result(work_data_search_queue) {
 		node_list = [ {
 			table : node_list
 		}, {
-			T : '點擊網站名稱可下載此網站之本作品。'
+			// gettext_config:{"id":"click-on-the-website-name-to-download-this-work-on-this-website"}
+			T : '點擊網站名稱即可下載此網站之本作品。'
 		}, {
 			br : null
 		} ];
 	} else {
 		node_list = [ {
+			// gettext_config:{"id":"this-work-was-not-found-on-all-websites"}
 			T : '所有網站都未能找到本作品。'
 		} ];
 	}
 
 	node_list.unshift({
+		// gettext_config:{"id":"search-results-for-$1"}
 		T : [ '搜尋作品[%1]之結果：',
 		// '<b>' + work_title + '</b>'
 		work_title ]
@@ -2021,7 +2233,8 @@ function show_search_result(work_data_search_queue) {
 		node_list.push({
 			// save
 			b : [ '📥', {
-				T : [ '下載所有%1個網站找到的作品', OK ]
+				// gettext_config:{"id":"download-all-works-found-on-$1-websites"}
+				T : [ '下載所有%1個{{PLURAL:%1|網站}}找到的作品', OK ]
 			} ],
 			onclick : function() {
 				for ( var site_id in work_data_search_queue) {
@@ -2038,9 +2251,10 @@ function show_search_result(work_data_search_queue) {
 		}, {
 			// add, append
 			b : [ {
-				span : '➕',
+				span : '➕😘',
 				S : old_Unicode_support ? 'color: #888;' : ''
 			}, {
+				// gettext_config:{"id":"add-all-the-works-found-on-$1-websites-to-the-website-s-favorite-list"}
 				T : [ '將所有%1個網站找到的作品全部加入網站各自之最愛清單', OK ]
 			} ],
 			onclick : function() {
@@ -2051,6 +2265,7 @@ function show_search_result(work_data_search_queue) {
 			C : 'button'
 		}, {
 			b : [ '📥😘', {
+				// gettext_config:{"id":"download-all-work-from-favorite-lists"}
 				T : '下載所有最愛清單中的本作品'
 			} ],
 			onclick : function() {
@@ -2079,6 +2294,7 @@ function show_search_result(work_data_search_queue) {
 		node_list.push({
 			hr : null
 		}, {
+			// gettext_config:{"id":"the-following-$1-websites-could-not-find-this-work"}
 			T : [ '以下%1個網站未能找到本作品：', not_found_list.length ]
 		});
 
@@ -2095,10 +2311,12 @@ function show_search_result(work_data_search_queue) {
 		not_found_list = [ {
 			tr : [ {
 				th : {
+					// gettext_config:{"id":"error-reason"}
 					T : '錯誤原因'
 				}
 			}, {
 				th : {
+					// gettext_config:{"id":"website-of-the-work"}
 					T : '作品網站'
 				},
 				S : 'max-width: 50%;'
@@ -2127,13 +2345,13 @@ function show_search_result(work_data_search_queue) {
 			table : not_found_list
 		});
 
-		// free
+		// Release memory. 釋放被占用的記憶體。
 		status_hash = not_found_list = null;
 	}
 
 	CeL.remove_all_child('search_results');
 	CeL.new_node(node_list, 'search_results');
-	// free
+	// Release memory. 釋放被占用的記憶體。
 	node_list = null;
 	delete CeL.get_element('search_results').running;
 }
@@ -2142,19 +2360,22 @@ var type_and_language_used;
 // 自動搜尋不同的網站並選擇下載作品。
 function search_work_title() {
 	// 點選 語言
-	if (test_and_attention('請先在網路作品區指定要搜尋的作品類別。', !type_and_language_used)) {
+	// gettext_config:{"id":"please-specify-the-category-of-the-item-you-want-to-search-in-the-online-production-area"}
+	if (test_and_attention('請先在網路作品區指定要搜尋的項目類別。', !type_and_language_used)) {
 		return;
 	}
 
 	// 搜尋名稱用於跨網站。僅能搜尋作品名稱，無法搜尋作品id。
 	// 另外假如您已知作品id，可以直接在最愛作品清單輸入id，用不著搜尋。
 	var work_title = CeL.node_value('#input_work_id').trim();
+	// gettext_config:{"id":"input-series-name-first"}
 	if (test_and_attention('請先輸入作品名稱。', !work_title)) {
 		CeL.get_element('input_work_id').focus();
 		return;
 	}
 
 	var sites = CeL.get_element('search_results');
+	// gettext_config:{"id":"searching-for-$1-you-must-cancel-the-current-search-process-before-you-can-search-again"}
 	if (test_and_attention([ '正在搜尋[%1]中，必須先取消當前的搜尋程序才能重新搜尋。', work_title ],
 			sites.running)) {
 		return;
@@ -2164,6 +2385,7 @@ function search_work_title() {
 	var guessed_language = CeL.guess_text_language(work_title);
 	if (!type_and_language_used.endsWith(guessed_language)) {
 		CeL.warn({
+			// gettext_config:{"id":"the-language-used-by-title-seems-to-be-$1-but-it-was-set-to-$2"}
 			T : [ '作品名稱之語言似乎為%1，但指定了%2。', guessed_language,
 					type_and_language_used ]
 		});
@@ -2171,9 +2393,11 @@ function search_work_title() {
 
 	CeL.remove_all_child('search_results');
 	CeL.new_node([ {
+		// gettext_config:{"id":"searching-for-$1"}
 		T : [ '正在搜尋[%1]中……', work_title ]
 	}, {
 		span : {
+			// gettext_config:{"id":"there-are-no-website-returns-yet"}
 			T : '尚無任何網站回傳結果……'
 		},
 		id : 'searching_process'
@@ -2182,6 +2406,7 @@ function search_work_title() {
 		id : 'still_searching'
 	}, {
 		b : {
+			// gettext_config:{"id":"cancel-search"}
 			T : '取消搜尋'
 		},
 		onclick : function() {
@@ -2190,9 +2415,10 @@ function search_work_title() {
 			CeL.remove_all_child('search_results');
 			delete CeL.get_element('search_results').running;
 		},
-		C : 'button'
+		C : 'button cancel'
 	}, {
 		b : {
+			// gettext_config:{"id":"abandon-the-website-that-has-not-yet-completed-the-search"}
 			T : '放棄還沒搜尋完成的網站'
 		},
 		onclick : function() {
@@ -2235,6 +2461,7 @@ function search_work_title() {
 				+ chapter_time_interval);
 		if (chapter_time_interval > 60 * 1000) {
 			all_done({
+				// gettext_config:{"id":"this-website-is-forced-to-wait-too-long-and-is-not-searched-for-anti-blocking"}
 				process_status : [ '本網站強制等待時間過長，為防封鎖不作搜尋。' ]
 			});
 			return;
@@ -2247,6 +2474,7 @@ function search_work_title() {
 
 			CeL.remove_all_child('searching_process');
 			CeL.new_node({
+				// gettext_config:{"id":"completed-$1"}
 				T : [ '已完成 %1', found + ' / ' + done + ' / ' + site_count ]
 			}, 'searching_process');
 
@@ -2259,7 +2487,9 @@ function search_work_title() {
 
 				CeL.remove_all_child('still_searching');
 				CeL.new_node({
-					T : [ '%1個網站仍在搜尋中：%2', still_searching.length,
+					T : [
+					// gettext_config:{"id":"$1-sites-are-still-searching-$2"}
+					'%1個{{PLURAL:%1|網站}}仍在搜尋中：%2', still_searching.length,
 							still_searching.join(', ') ]
 				}, 'still_searching');
 			}
@@ -2280,6 +2510,7 @@ function for_all_crawler_loaded(operator) {
 
 function get_crawler(site_id, just_test) {
 	site_id = site_id || site_used;
+	// gettext_config:{"id":"please-specify-site-to-download-first"}
 	var attention_message = '請先指定要下載的網站。';
 	if (!site_id) {
 		if (!just_test) {
@@ -2295,9 +2526,11 @@ function get_crawler(site_id, just_test) {
 
 	var crawler = base_directory + site_id + '.js';
 	CeL.debug({
+		// gettext_config:{"id":"current-path-$1"}
 		T : [ '當前路徑：%1', CeL.storage.working_directory() ]
 	}, 1, 'get_crawler');
 	CeL.debug({
+		// gettext_config:{"id":"load-and-use-the-download-tool-$1"}
 		T : [ '載入並使用下載工具 %1', crawler ]
 	}, 1, 'get_crawler');
 
@@ -2317,6 +2550,7 @@ function get_crawler(site_id, just_test) {
 		CeL.toggle_display('favorites_panel', true);
 		CeL.toggle_display('download_options_panel', true);
 		set_panel_height('favorites_panel');
+		// gettext_config:{"id":"select-download-tool-$1"}
 		process.title = _('選擇下載工具：%1', crawler.site_id);
 	}
 
@@ -2334,6 +2568,7 @@ function Download_job(crawler, work_id) {
 	// 顯示下載進度條。
 	this.progress_layer = CeL.new_node({
 		div : {
+			// gettext_config:{"id":"download-task-initialization-reading-work-information"}
 			T : '下載任務初始化、讀取作品資訊中……'
 		},
 		C : 'progress_layer'
@@ -2359,11 +2594,14 @@ function Download_job(crawler, work_id) {
 		}, {
 			span : [ old_Unicode_support ? '' : '⏸', {
 				// 暫停下載 (略稱)
+				// gettext_config:{"id":"stop"}
 				T : '暫停'
 			} ],
-			R : (old_Unicode_support ? '' : '⏯ ') + _('暫停/恢復下載')
-			//
-			+ '\n' + _('不會馬上反應，會等到當前的章節處理完畢才處理。'),
+			R : (old_Unicode_support ? '' : '⏯ ')
+			// gettext_config:{"id":"pause-resume"}
+			+ _('暫停/恢復下載') + '\n'
+			// gettext_config:{"id":"it-will-not-react-immediately-and-will-wait-until-the-current-chapter-is-processed"}
+			+ _('不會馬上反應，將等到當前的章節處理完畢才處理。'),
 			C : 'task_controller',
 			onclick : function(event) {
 				return pause_resume_job(this, this_job);
@@ -2374,14 +2612,20 @@ function Download_job(crawler, work_id) {
 				S : 'color: red;'
 			}, {
 				// 取消下載 (略稱)
+				// gettext_config:{"id":"cancel"}
 				T : '取消'
 			} ],
-			R : _('取消下載') + '\n' + _('不會馬上反應，會等到當前的章節處理完畢才處理。'),
+			// gettext_config:{"id":"cancel-download"}
+			R : _('取消下載') + '\n'
+			// gettext_config:{"id":"it-will-not-react-immediately-and-will-wait-until-the-current-chapter-is-processed"}
+			+ _('不會馬上反應，將等到當前的章節處理完畢才處理。'),
 			C : 'task_controller',
 			onclick : cancel_task.bind(null, this_job)
 		}, {
 			span : '📂',
-			R : (old_Unicode_support ? '' : '🗁 ') + _('開啓作品下載目錄'),
+			R : (old_Unicode_support ? '' : '🗁 ')
+			// gettext_config:{"id":"open-download-folder"}
+			+ _('開啓作品下載目錄'),
 			C : 'task_controller',
 			onclick : open_download_directory.bind(null, this)
 		} ],
@@ -2401,13 +2645,16 @@ function pause_resume_job(this_node, this_job) {
 		continue_task(this_job);
 		CeL.DOM.set_text(this_node,
 		// pause
-		_((old_Unicode_support ? '' : '⏸') + _('暫停')));
+		_((old_Unicode_support ? '' : '⏸')
+		// gettext_config:{"id":"stop"}
+		+ _('暫停')));
 	} else {
 		this_node.stopped = true;
 		stop_task(this_job);
-		CeL.DOM.set_text(this_node,
+		CeL.DOM.set_text(this_node, _('▶️'
 		// resume ⏯ "恢復下載 (略稱)"
-		_('▶️' + _('繼續')));
+		// gettext_config:{"id":"continue"}
+		+ _('繼續')));
 	}
 	return false;
 }
@@ -2420,6 +2667,7 @@ function is_Download_job(value) {
 }
 
 function add_new_download_job(crawler, work_id, no_message) {
+	// gettext_config:{"id":"input-series-name-or-id-first"}
 	var attention_message = '請先輸入作品名稱或🆔。';
 	hide_attention_panel(attention_message);
 
@@ -2432,6 +2680,7 @@ function add_new_download_job(crawler, work_id, no_message) {
 			if (!no_message) {
 				CeL.info([ {
 					T : [
+							// gettext_config:{"id":"downloading-«$2»-from-$1.-please-wait-until-the-download-is-complete-or-cancel-the-download-before-downloading-$3"}
 							'正在從%1下載《%2》這個作品。將等到這個作品下載完畢，或者取消下載後，再下載 %3。',
 							crawler.site_name,
 							crawler.downloading_work_data.title
@@ -2476,7 +2725,7 @@ function destruct_download_job(crawler) {
 	}
 
 	var job_index = work_data.job_index, job = Download_job.job_list[job_index];
-	// free
+	// Release memory. 釋放被占用的記憶體。
 	delete crawler.downloading_work_data;
 	delete work_data.job_index;
 	function remove_download_work_layer() {
@@ -2485,10 +2734,11 @@ function destruct_download_job(crawler) {
 	}
 	if (work_data.error_list
 			|| default_configuration.preserve_download_work_layer) {
-		// remove "暫停"
+		// remove "暫停" (gettext_config:{"id":"stop"})
 		// job.layer.removeChild(job.layer.firstChild);
 		CeL.new_node([ {
 			T : '↻',
+			// gettext_config:{"id":"redownloading"}
 			R : _('重新下載'),
 			C : 'task_controller',
 			onclick : function() {
@@ -2503,6 +2753,7 @@ function destruct_download_job(crawler) {
 			S : 'color: blue; font-weight: bold;'
 		}, {
 			T : old_Unicode_support ? '❌' : '🗙',
+			// gettext_config:{"id":"clearing-downloaded-record"}
 			R : '清除本下載紀錄',
 			C : 'task_controller',
 			onclick : function() {
@@ -2522,8 +2773,10 @@ function destruct_download_job(crawler) {
 			+ work_data.error_list[work_data.error_list.length - 1] + '</span>'
 			//
 			+ (work_data.error_list.length > 1 ? ' <small>'
+			// gettext_config:{"id":"(there-are-$1-errors-in-total)"}
+			+ _('（總共有%1個{{PLURAL:%1|錯誤}}）',
 			//
-			+ _('（總共有%1個錯誤）', work_data.error_list.length) + '</small>' : '');
+			work_data.error_list.length) + '</small>' : '');
 			job.layer.title = work_data.error_list.join(CeL.env.line_separator);
 			if (false)
 				CeL.new_node([ {
@@ -2668,6 +2921,7 @@ function start_gui_crawler() {
 
 	// initialization && initialization();
 
+	// gettext_config:{"id":"input-series-name-or-id-first"}
 	var attention_message = '請先輸入作品名稱或🆔。';
 
 	// or work_title
@@ -2726,11 +2980,12 @@ function open_download_directory(crawler) {
 function check_update_NOT_package() {
 	// ，請勿關閉程式
 	CeL.log({
+		// gettext_config:{"id":"auto-updating-to-git-master-branch-version"}
 		T : '自動更新非安裝包版本中……'
 	});
 
 	// 非安裝包圖形介面自動更新功能。
-	// This method can not get update result.
+	// This method cannot get update result.
 	require('child_process').exec('node work_crawler.updater.js', {
 		// pass I/O to the child process
 		// https://nodejs.org/api/child_process.html#child_process_options_stdio
@@ -2738,28 +2993,35 @@ function check_update_NOT_package() {
 	}, function(error, stdout, stderr) {
 		if (error) {
 			CeL.error({
+				// gettext_config:{"id":"updating-tool-failed-$1"}
 				T : [ '非安裝包版本更新失敗：%1', error ]
 			});
 			show_attention({
 				b : {
+					// gettext_config:{"id":"updating-tool-failed-$1"}
 					T : [ '非安裝包版本更新失敗：%1', error ]
 				}
 			});
 		} else {
 			CeL.log({
+				// gettext_config:{"id":"git-master-branch-update-completed.-you-have-to-restart-the-application-to-use-the-new-version"}
 				T : '非安裝包版本更新完畢。您需要重新啟動程式以使用新版本。'
 			});
 
 			CeL.new_node({
 				// 重新啟動應用程式或重新整理網頁(Ctrl-R)
 				span : [ {
+					// gettext_config:{"id":"update-completed"}
 					T : '更新完畢。'
 				}, {
+					// gettext_config:{"id":"restart-the-program"}
 					T : '重新啟動應用程式。'
 				}, {
+					// gettext_config:{"id":"all-current-jobs-will-be-interrupted"}
 					T : '所有當前作業都會中斷！',
 					S : 'color: red; font-weight: bold;'
 				} ],
+				// gettext_config:{"id":"it-is-recommended-to-restart-the-application-to-use-the-fully-updated-program"}
 				R : _('建議重新啟動應用程式以使用完整更新後的程式。'),
 				S : 'cursor: pointer;',
 				onclick : function() {
@@ -2777,6 +3039,7 @@ function check_update_NOT_package() {
 function check_update() {
 	if (!global.auto_update) {
 		CeL.log({
+			// gettext_config:{"id":"automatically-update-is-disabled"}
 			T : '已設定不自動更新。'
 		});
 		return;
@@ -2789,11 +3052,13 @@ function check_update() {
 	}
 
 	CeL.debug({
+		// gettext_config:{"id":"checking-update"}
 		T : '檢查更新中……'
 	});
 	var GitHub_repository_path = 'kanasimi/work_crawler';
 	var update_panel = CeL.new_node({
 		div : {
+			// gettext_config:{"id":"checking-update"}
 			T : '檢查更新中……',
 			C : 'waiting'
 		},
@@ -2808,6 +3073,7 @@ function check_update() {
 		if (!version_data.has_new_version) {
 			// check completed
 			CeL.log({
+				// gettext_config:{"id":"great-you-re-updated"}
 				T : '未發現新版本。'
 			});
 			CeL.toggle_display(update_panel, false);
@@ -2820,6 +3086,7 @@ function check_update() {
 		package_data = CeL.read_file(package_data + 'package.json');
 		if (!package_data) {
 			CeL.error({
+				// gettext_config:{"id":"unable-to-read-version-information-from-package.json"}
 				T : '無法讀取版本資訊 package.json！'
 			});
 			CeL.toggle_display(update_panel, false);
@@ -2831,6 +3098,7 @@ function check_update() {
 				&& package_data.version;
 		CeL.new_node([ {
 			a : {
+				// gettext_config:{"id":"update-available-$1"}
 				T : [ '有新版本：%1', version_data.latest_version ]
 			},
 			href : 'https://github.com/' + GitHub_repository_path,
@@ -2840,6 +3108,7 @@ function check_update() {
 		}, '← ' + has_version ] : '' ], [ update_panel, 'clean' ]);
 		show_attention({
 			a : {
+				// gettext_config:{"id":"update-available-$1"}
 				T : [ '有新版本：%1', version_data.latest_version ]
 			},
 			href : 'https://github.com/' + GitHub_repository_path,
@@ -2856,8 +3125,10 @@ function check_update() {
 
 	} catch (e) {
 		CeL.error({
+			// gettext_config:{"id":"update-checking-failed-$1"}
 			T : [ '更新檢測失敗：%1', e ]
 		});
+		// gettext_config:{"id":"update-failed"}
 		CeL.node_value(update_panel, _('更新失敗！'));
 		CeL.set_class(update_panel, 'check_failed', {
 			reset : true
@@ -2910,6 +3181,7 @@ function recerive_dialog_result(event, result) {
 function open_DevTools() {
 	node_electron.ipcRenderer.send('open_DevTools', true);
 	console.warn('-'.repeat(80));
+	// gettext_config:{"id":"this-column-is-basically-for-debugging-purposes-only.-if-you-have-downloading-problems-please-feel-free-to-report-the-issue-thank-you"}
 	console.warn(_('本欄基本上僅供調試使用。若您有下載功能方面的需求，煩請提報議題，謝謝。') + ' '
 			+ 'https://github.com/kanasimi/work_crawler/issues');
 	return false;
